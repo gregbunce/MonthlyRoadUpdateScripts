@@ -57,7 +57,6 @@ arcpy.PackageLocator_geocoding(roadsLocator, roadsLocator + '.gcpk', "COPY_ARCSD
 arcpy.PackageLocator_geocoding(compositeLocator, compositeLocator + '.gcpk', "COPY_ARCSDE", "#","AGRC Composite Locator","AGRC; CompositeAddressLocator")
 
 
-
 ##################################################################################################
 #### move the old locators, packages, and gdb to the _previous folder on hnas ####
 # delete all files in the backup folder
