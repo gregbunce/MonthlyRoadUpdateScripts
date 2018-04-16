@@ -1,5 +1,6 @@
 import arcpy, os, zipfile, glob
 
+#### Zip Shapefile ####
 def ZipShp (inShp, Delete = True):
  
     """
@@ -58,7 +59,7 @@ def ZipShp (inShp, Delete = True):
     #Return zipfile full path
     return zipfl
 
-
+#### Zip File Geodatabase ####
 def ZipFileGeodatabase(inFileGeodatabase, newZipFN):
    if not (os.path.exists(inFileGeodatabase)):
       return False
@@ -75,3 +76,32 @@ def ZipFileGeodatabase(inFileGeodatabase, newZipFN):
    zipobj.close()
 
    return True
+
+#### Zip Locator Packages ####
+def ZipLocatorPackages (folderLocation, outputName):
+     
+    #List of file extensions
+    extensions = [".gcpk"]
+
+    # Create zipfile name
+    zipfl = os.path.join (folderLocation, outputName + "_gcpk.zip")
+    # Create zipfile object
+    ZIP = zipfile.ZipFile (zipfl, "w")
+     
+    # Iterate files in directory
+    for fl in os.listdir (folderLocation):
+        # Iterate extensions
+        for extension in extensions:
+            # Check if file has correct extension
+            if fl.endswith(extension):
+                # Get full path of file
+                packageName = os.path.join (folderLocation, fl)
+                # Add file to zipfile
+                ZIP.write (packageName, fl)
+                break
+ 
+    # Close zipfile object
+    ZIP.close()
+ 
+    # Return zipfile full path
+    return zipfl

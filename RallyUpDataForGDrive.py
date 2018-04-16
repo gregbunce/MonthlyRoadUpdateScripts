@@ -80,29 +80,25 @@ def ZipFileGeodatabase(inFileGeodatabase, newZipFN):
 #### Zip File Geodatabase function <<< END ####
 
 def ZipLocatorPackages (folderLocation, outputName):
- 
-    """
-    Creates a zip file containing all the locator packages in the folder
-    """
      
-    #List of shapefile file extensions
+    #List of file extensions
     extensions = [".gcpk"]
-    
-    #Create zipfile name
+
+    # Create zipfile name
     zipfl = os.path.join (folderLocation, outputName + "_gcpk.zip")
-    #Create zipfile object
+    # Create zipfile object
     ZIP = zipfile.ZipFile (zipfl, "w")
      
-    #Iterate files in directory
+    # Iterate files in directory
     for fl in os.listdir (folderLocation):
-        #Iterate extensions
+        # Iterate extensions
         for extension in extensions:
-            #Check if file is shapefile file
-            if fl.endswith('extension'):
+            # Check if file has correct extension
+            if fl.endswith(extension):
                 #Get full path of file
-                outputName = os.path.join (folderLocation, fl)
+                packageName = os.path.join (folderLocation, fl)
                 #Add file to zipfile
-                ZIP.write (outputName, fl)
+                ZIP.write (packageName, fl)
                 break
  
     #Close zipfile object
@@ -129,51 +125,51 @@ else:
 # set this folder as the work env
 arcpy.env.workspace = directory
 
-##### Fetch the data and bring it to D:\DataForGDrive\ #### 
-### RoadGrinder.gdb
-#roadGrinderDatabase = "K:/AGRC Projects/Locators/RoadGrinder.gdb"
-#print "Copying RoadGrinder.gdb from HNAS Locators folder to the DataForGDrive folder ..."
-#arcpy.Copy_management(roadGrinder_FromLocatorFolder, "RoadGrinder.gdb")
+#### Fetch the data and bring it to D:\DataForGDrive\ #### 
+## RoadGrinder.gdb
+roadGrinderDatabase = "K:/AGRC Projects/Locators/RoadGrinder.gdb"
+print "Copying RoadGrinder.gdb from HNAS Locators folder to the DataForGDrive folder ..."
+arcpy.Copy_management(roadGrinder_FromLocatorFolder, "RoadGrinder.gdb")
 
-### UtahNG911GIS.gdb
-#ng911Database = "K:/AGRC Projects/911/NG911/Data/UtahNG911GIS.gdb"
-#print "Copying UtahNG911GIS.gdb from HNAS NG911 folder to the DataForGDrive folder ..."
-#arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
+## UtahNG911GIS.gdb
+ng911Database = "K:/AGRC Projects/911/NG911/Data/UtahNG911GIS.gdb"
+print "Copying UtahNG911GIS.gdb from HNAS NG911 folder to the DataForGDrive folder ..."
+arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
 
-### Roads.gdb
-#sgidRoads = r"Database Connections\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\SGID10.TRANSPORTATION.Roads"
-#arcpy.CreateFileGDB_management(directory, "Roads.gdb")
-#print "Importing SGID.Roads into Road.gdb ..."
-#arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
+## Roads.gdb
+sgidRoads = r"Database Connections\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\SGID10.TRANSPORTATION.Roads"
+arcpy.CreateFileGDB_management(directory, "Roads.gdb")
+print "Importing SGID.Roads into Road.gdb ..."
+arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
 
-### Roads.shp
-#print "Importing SGID.Roads into Road.shp ..."
-#arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
+## Roads.shp
+print "Importing SGID.Roads into Road.shp ..."
+arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
 
-### AGRC_AddressPointLocator.gcpk
-#addressPntLocatorPackage = "D:/Rebuild Address Locators/AGRC_AddressPointLocator.gcpk"
-#print "Copying AGRC_AddressPointLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
-#arcpy.Copy_management(addressPntLocatorPackage, "AGRC_AddressPointLocator.gcpk")
-
-
-### AGRC_RoadsLocator.gcpk
-#roadsLocatorPackage = "D:/Rebuild Address Locators/AGRC_RoadsLocator.gcpk"
-#print "Copying AGRC_RoadsLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
-#arcpy.Copy_management(roadsLocatorPackage, "AGRC_RoadsLocator.gcpk")
+## AGRC_AddressPointLocator.gcpk
+addressPntLocatorPackage = "D:/Rebuild Address Locators/AGRC_AddressPointLocator.gcpk"
+print "Copying AGRC_AddressPointLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
+arcpy.Copy_management(addressPntLocatorPackage, "AGRC_AddressPointLocator.gcpk")
 
 
-### AGRC_CompositeLocator.gcpk
-#compositeLocatorPackage = "D:/Rebuild Address Locators/AGRC_CompositeLocator.gcpk"
-#print "Copying AGRC_CompositeLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
-#arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
+## AGRC_RoadsLocator.gcpk
+roadsLocatorPackage = "D:/Rebuild Address Locators/AGRC_RoadsLocator.gcpk"
+print "Copying AGRC_RoadsLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
+arcpy.Copy_management(roadsLocatorPackage, "AGRC_RoadsLocator.gcpk")
 
 
-##### now compress the files (zip them up)
-## zip the shapefile
-#ZipShp(directory + "/Roads.shp", False)
+## AGRC_CompositeLocator.gcpk
+compositeLocatorPackage = "D:/Rebuild Address Locators/AGRC_CompositeLocator.gcpk"
+print "Copying AGRC_CompositeLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
+arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
 
-## zip the geodatabase
-#ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
+
+#### now compress the files (zip them up)
+# zip the shapefile
+ZipShp(directory + "/Roads.shp", False)
+
+# zip the geodatabase
+ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
 
 # zip the locator packages
 ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")
