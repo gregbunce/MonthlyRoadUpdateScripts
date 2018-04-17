@@ -95,16 +95,16 @@ def ZipLocatorPackages (folderLocation, outputName):
         for extension in extensions:
             # Check if file has correct extension
             if fl.endswith(extension):
-                #Get full path of file
+                # Get full path of file
                 packageName = os.path.join (folderLocation, fl)
-                #Add file to zipfile
+                # Add file to zipfile
                 ZIP.write (packageName, fl)
                 break
  
-    #Close zipfile object
+    # Close zipfile object
     ZIP.close()
  
-    #Return zipfile full path
+    # Return zipfile full path
     return zipfl
 
 
@@ -129,7 +129,7 @@ arcpy.env.workspace = directory
 ## RoadGrinder.gdb
 roadGrinderDatabase = "K:/AGRC Projects/Locators/RoadGrinder.gdb"
 print "Copying RoadGrinder.gdb from HNAS Locators folder to the DataForGDrive folder ..."
-arcpy.Copy_management(roadGrinder_FromLocatorFolder, "RoadGrinder.gdb")
+arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
 
 ## UtahNG911GIS.gdb
 ng911Database = "K:/AGRC Projects/911/NG911/Data/UtahNG911GIS.gdb"
