@@ -79,6 +79,8 @@ def ZipFileGeodatabase(inFileGeodatabase, newZipFN):
    return True
 #### Zip File Geodatabase function <<< END ####
 
+
+#### BEGIN >>> Zip Locator Packages function ####
 def ZipLocatorPackages (folderLocation, outputName):
      
     #List of file extensions
@@ -106,9 +108,9 @@ def ZipLocatorPackages (folderLocation, outputName):
  
     # Return zipfile full path
     return zipfl
+#### Zip Locator Packages function <<< END ####
 
-
-
+#### __Main__ ####
 #### Create a folder based on the date (ie: Year_Month_Day = 2018_4_16)
 now = datetime.datetime.now()
 year = now.year
