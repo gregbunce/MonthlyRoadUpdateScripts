@@ -2,7 +2,6 @@ import arcpy, os, zipfile, glob
 
 #### Zip Shapefile ####
 def ZipShp (inShp, Delete = True):
- 
     """
     Creates a zip file containing the input shapefile
     inputs -
@@ -61,25 +60,38 @@ def ZipShp (inShp, Delete = True):
 
 #### Zip File Geodatabase ####
 def ZipFileGeodatabase(inFileGeodatabase, newZipFN):
-   if not (os.path.exists(inFileGeodatabase)):
-      return False
+    """
+    Creates a zip file containing the input file geodatabase
+    inputs -
+    inFileGeodatabase: Full path to file geodatabase to be zipped
+    newZipFN: The name for the output zip file (with the ".zip" extention)
+    """
 
-   if (os.path.exists(newZipFN)):
-      os.remove(newZipFN)
+    if not (os.path.exists(inFileGeodatabase)):
+        return False
 
-   zipobj = zipfile.ZipFile(newZipFN,'w')
+    if (os.path.exists(newZipFN)):
+        os.remove(newZipFN)
 
-   for infile in glob.glob(inFileGeodatabase+"/*"):
-      zipobj.write(infile, os.path.basename(inFileGeodatabase)+"/"+os.path.basename(infile), zipfile.ZIP_DEFLATED)
-      print ("Zipping: "+infile)
+    zipobj = zipfile.ZipFile(newZipFN,'w')
 
-   zipobj.close()
+    for infile in glob.glob(inFileGeodatabase+"/*"):
+        zipobj.write(infile, os.path.basename(inFileGeodatabase)+"/"+os.path.basename(infile), zipfile.ZIP_DEFLATED)
+        print ("Zipping: "+infile)
 
-   return True
+    zipobj.close()
+
+    return True
 
 #### Zip Locator Packages ####
 def ZipLocatorPackages (folderLocation, outputName):
-     
+    """
+    Creates a zip file containing all locator packages within the input folder
+    inputs -
+    folderLocation: Folder path where address locator packages (to be zipped) reside
+    outputName: The name for the output zip file (without the ".zip" extention)
+    """     
+
     #List of file extensions
     extensions = [".gcpk"]
 
