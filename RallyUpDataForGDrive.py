@@ -170,8 +170,9 @@ arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
 # zip the shapefile
 ZipShp(directory + "/Roads.shp", False)
 
-# zip the geodatabase
+# zip the geodatabases
 ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
+ZipFileGeodatabase(directory + "/UtahNG911GIS.gdb", directory + "/UtahNG911GIS_gdb.zip")
 
 # zip the locator packages
 ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")
