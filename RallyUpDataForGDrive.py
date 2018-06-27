@@ -129,13 +129,13 @@ arcpy.env.workspace = directory
 
 #### Fetch the data and bring it to D:\DataForGDrive\ #### 
 ## RoadGrinder.gdb
-roadGrinderDatabase = "K:/AGRC Projects/Locators/RoadGrinder.gdb"
-print "Copying RoadGrinder.gdb from HNAS Locators folder to the DataForGDrive folder ..."
+roadGrinderDatabase = "G:/Team Drives/AGRC Projects/Locators/RoadGrinder.gdb"
+print "Copying RoadGrinder.gdb from Google-Team-Drive Locators folder to the DataForGDrive folder ..."
 arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
-
 ## UtahNG911GIS.gdb
-ng911Database = "K:/AGRC Projects/911/NG911/Data/UtahNG911GIS.gdb"
-print "Copying UtahNG911GIS.gdb from HNAS NG911 folder to the DataForGDrive folder ..."
+ng911Database = "G:/Team Drives/AGRC Projects/911/NG911/Data/UtahNG911GIS.gdb"
+
+print "Copying UtahNG911GIS.gdb from Google-Team-Drive NG911 folder to the DataForGDrive folder ..."
 arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
 
 ## Roads.gdb
@@ -173,6 +173,7 @@ ZipShp(directory + "/Roads.shp", False)
 # zip the geodatabases
 ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
 ZipFileGeodatabase(directory + "/UtahNG911GIS.gdb", directory + "/UtahNG911GIS_gdb.zip")
+ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
 
 # zip the locator packages
 ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")
