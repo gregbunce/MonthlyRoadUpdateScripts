@@ -3,8 +3,10 @@ import arcpy, shutil, os
 # variables
 rebuildLocators_Folder = 'D:/Rebuild Address Locators'
 previousRebuildLocators_Folder = 'D:/Rebuild Address Locators/_previousRebuild'
-hnasLocators_Folder = 'K:/AGRC Projects/Locators'
-previousHnasLocators_Folder = 'K:/AGRC Projects/Locators/PreviousLocators'
+#hnasLocators_Folder = 'K:/AGRC Projects/Locators'
+hnasLocators_Folder = r'G:\Team Drives\AGRC Projects\Locators'
+#previousHnasLocators_Folder = 'K:/AGRC Projects/Locators/PreviousLocators'
+previousHnasLocators_Folder = r'G:\Team Drives\AGRC Projects\Locators\PreviousLocators'
 sgidAddressPoints = r"Database Connections\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\SGID10.LOCATION.AddressPoints"
 addressPointLocator = "AGRC_AddressPointLocator"
 roadsLocator = "AGRC_RoadsLocator"
@@ -60,20 +62,20 @@ arcpy.PackageLocator_geocoding(compositeLocator, compositeLocator + '.gcpk', "CO
 ##################################################################################################
 #### move the old locators, packages, and gdb to the _previous folder on hnas ####
 # delete all files in the backup folder
-print "Deleting the folder and all the files >>> K:/AGRC Projects/Locators/PreviousLocators ..."
+print "Deleting the folder and all the files >>> G:/Team Drives/AGRC Projects/Locators/PreviousLocators ..."
 shutil.rmtree(previousHnasLocators_Folder)
 # create the folder again
-print "Recreating the empty directory K:/AGRC Projects/Locators/PreviousLocators ..."
+print "Recreating the empty directory G:/Team Drives/AGRC Projects/Locators/PreviousLocators ..."
 os.makedirs(previousHnasLocators_Folder)
 
 # copy the rebuilt locators, locator packages, and new roadgrinder.gdb to hnas
 files = os.listdir(hnasLocators_Folder)
-print "Moving existing files in K:/AGRC Projects/Locators to K:/AGRC Projects/Locators/PreviousLocators ..."
+print "Moving existing files in G:/Team Drives/AGRC Projects/Locators to G:/Team Drives/AGRC Projects/Locators/PreviousLocators ..."
 for f in files:
     shutil.move(hnasLocators_Folder+ "/" + f, previousHnasLocators_Folder)
 
-### Copy contents from rebuild folders to K:/AGRC Projects/Locators
-print "Copying files from D:/Rebuild Address Locators to K:/AGRC Projects/Locators ..."
+### Copy contents from rebuild folders to G:/Team Drives/AGRC Projects/Locators
+print "Copying files from D:/Rebuild Address Locators to G:/Team Drives/AGRC Projects/Locators ..."
 arcpy.Copy_management("/RoadGrinder.gdb", hnasLocators_Folder + "/RoadGrinder.gdb")
 arcpy.Copy_management(addressPointLocator, hnasLocators_Folder + "/" + addressPointLocator)
 arcpy.Copy_management(roadsLocator, hnasLocators_Folder + "/" + roadsLocator)
