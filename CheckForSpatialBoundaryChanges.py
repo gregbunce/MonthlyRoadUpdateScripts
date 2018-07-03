@@ -14,7 +14,6 @@ def DeletePreviousBoundaries():
                 arcpy.Delete_management(fc)
                 
 
-
 def RenameExistingDatasets():
     print("Renaming existing boundaries to append _Prev...")
     datasets = arcpy.ListDatasets(feature_type='feature')
@@ -42,14 +41,83 @@ def RunSymmetricalDifference():
 
 
 def GetBoundaryUpdates_Count():
-    # switch workspace for this function (.ListDatasets)
-    arcpy.env.workspace = str(changes_fgdb)
+    try:
+        # switch workspace for this function (.ListDatasets)
+        arcpy.env.workspace = str(changes_fgdb)
+        ##arcpy.env.workspace = 'D:\\BoundaryChanges\\Changes_2018_7_2.gdb'
 
-    # loop through the feature classes and get count if feature class name conatins SymDiff_
-    for fc in arcpy.ListFeatureClasses():
-        count = arcpy.GetCount_management(fc)
-        log_file.write(str(fc) + " Change Count: " + str(count) + "\n")
-        print(str(fc) + " Change Count: " + str(count))
+        # loop through the feature classes and get count if feature class name conatins SymDiff_
+        for fc in arcpy.ListFeatureClasses():
+            count = arcpy.GetCount_management(fc)
+            log_file.write(str(fc) + " Change Count: " + str(count) + "\n")
+            print(str(fc) + " Change Count: " + str(count))
+
+            # Null out spatial values for these fields
+            if int(count[0]) > 0:
+                NullOutSpatialValuesIfChangesFound(fc)
+    except Exception:
+        e = sys.exc_info()[1]
+        print("GetBoundaryUpdates_Count Error: " + e.args[0])
+        log_file.write("GetBoundaryUpdates_Count ERROR MESSAGE: " + e.args[0] + "\n")
+
+
+def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
+    try:
+        field_array = []
+        if str(sgid_polygon_containing_edits) == "SymDiff_AddressSystemQuadrants":
+            field_array = ['QUADRANT_L', 'QUADRANT_R', 'ADDRSYS_L', 'ADDRSYS_R']
+        elif str(sgid_polygon_containing_edits) == "SymDiff_Counties":
+            field_array = ['COUNTY_L', 'COUNTY_R']
+        elif str(sgid_polygon_containing_edits) == "SymDiff_MetroTownships":
+            field_array = ['UNINCCOM_L', 'UNINCCOM_R']
+        elif str(sgid_polygon_containing_edits) == "SymDiff_Municipalities":
+            field_array = ['INCMUNI_L', 'INCMUNI_R']
+        elif str(sgid_polygon_containing_edits) == "SymDiff_ZipCodes":
+            field_array = ['POSTCOMM_L', 'POSTCOMM_R', 'ZIPCODE_L', 'ZIPCODE_R']
+        else:
+            log_file.write("Did not null values in UTRANS Roads_Edit for related spatial polygon because it did not recognize the parameter: " + str(sgid_polygon_containing_edits) + "\n")
+    
+        #database_connection = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde'
+        #roads_feature_class = 'UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit'
+        database_connection = 'D:\\BoundaryChanges\\NullValueTesting.gdb'
+        roads_feature_class = '\\Roads_Edit'
+
+        # Open an edit session and start an edit operation
+        edit = arcpy.da.Editor(database_connection)
+        # Edit session is started without an undo/redo stack for versioned data
+        #(for second argument, use False for unversioned data)
+        # edit.startEditing ({with_undo}, {multiuser_mode})
+        ## edit.startEditing(False, True) # for versioned data
+        edit.startEditing(False, False) # for unversioned data
+        edit.startOperation()
+
+        # Make a layer and select cities which overlap the chihuahua polygon
+        arcpy.MakeFeatureLayer_management(database_connection + roads_feature_class, 'roads_lyr') 
+        arcpy.MakeFeatureLayer_management(sgid_polygon_containing_edits, 'boundary_changes_lyr')
+        arcpy.SelectLayerByLocation_management('roads_lyr', 'INTERSECT', 'boundary_changes_lyr')
+
+        cursor = arcpy.da.UpdateCursor('roads_lyr', field_array) #, query)
+
+        # Loop through rows & create temporary dictionary of values
+        for row in cursor:
+            # null values for the appropriate fields
+            row_index = 0
+            for field in field_array:
+                print(str(field))
+                #row.setValue(field, None)
+                row[row_index] = None
+                row_index = row_index + 1
+            cursor.updateRow(row)
+
+        del cursor
+        del row
+        edit.stopOperation()
+        edit.stopEditing(True)
+        log_file.write("  Nulled-out attributes for the following fields: " + str(field_array) + "\n")
+    except Exception:
+        e = sys.exc_info()[1]
+        print("NullOutSpatialValuesIfChangesFound Error: " + e.args[0])
+        log_file.write("NullOutSpatialValuesIfChangesFound ERROR MESSAGE: " + e.args[0] + "\n")
 
 
 # Main function
@@ -106,7 +174,10 @@ if __name__ == "__main__":
         log_file.close()
         # create the changed fgdb for symmetrical difference output
         #arcpy.CreateFileGDB_management(projectFolder, changesFGDB)
-    except Exception as e:
-        log_file.write('An exception has occured - %s' % e)
+    except Exception:
+        e = sys.exc_info()[1]
+        print(e.args[0])
+        log_file.write("ERROR MESSAGE: " + e.args[0]+ "\n")
+        #log_file.write('An exception has occured - %s' % e)
 
 
