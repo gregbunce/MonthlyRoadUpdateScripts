@@ -1,6 +1,7 @@
 import arcpy, os, datetime
 
 # this runs as on a weekly scheduled task on my machine (for now - then maybe forklift after testing)
+# Note: search for "##" and switch out lines when going live to sde roads editing
 
 def DeletePreviousBoundaries():
     print("Deleting _Prev boundaries...")
@@ -13,7 +14,6 @@ def DeletePreviousBoundaries():
             if "_Prev" in str(fc):
                 arcpy.Delete_management(fc)
                 
-
 def RenameExistingDatasets():
     print("Renaming existing boundaries to append _Prev...")
     datasets = arcpy.ListDatasets(feature_type='feature')
@@ -24,7 +24,6 @@ def RenameExistingDatasets():
             #path = os.path.join(arcpy.env.workspace, ds, fc)
             arcpy.Rename_management(fc, fc + "_Prev")
 
-
 def ImportSGIDBoundaries():
     print("Importing SGID boundaries...")
     for feature_class in feature_class_list:
@@ -33,12 +32,10 @@ def ImportSGIDBoundaries():
         else:
             arcpy.FeatureClassToFeatureClass_conversion(sgid_connection + "BOUNDARIES." + feature_class, arcpy.env.workspace, feature_class)
 
-
 def RunSymmetricalDifference():
     print("Running symmetrical difference to look for changes...")
     for feature_class in feature_class_list:
         arcpy.SymDiff_analysis(feature_class + "_Prev", feature_class, str(changes_fgdb) + "/SymDiff_" + str(feature_class), "ALL")
-
 
 def GetBoundaryUpdates_Count():
     try:
@@ -60,7 +57,6 @@ def GetBoundaryUpdates_Count():
         print("GetBoundaryUpdates_Count Error: " + e.args[0])
         log_file.write("GetBoundaryUpdates_Count ERROR MESSAGE: " + e.args[0] + "\n")
 
-
 def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
     try:
         field_array = []
@@ -77,10 +73,11 @@ def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
         else:
             log_file.write("Did not null values in UTRANS Roads_Edit for related spatial polygon because it did not recognize the parameter: " + str(sgid_polygon_containing_edits) + "\n")
     
-        #database_connection = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde'
-        #roads_feature_class = 'UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit'
-        database_connection = 'D:\\BoundaryChanges\\NullValueTesting.gdb'
-        roads_feature_class = '\\Roads_Edit'
+        ##database_connection = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde' # edit on sde EDIT version data
+        ##database_connection = 'Database Connections\gbunce@utrans.agrc.utah.gov.sde' # edit on sde my-user's version data
+        ##roads_feature_class = 'UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # edit on sde data
+        database_connection = 'D:\\BoundaryChanges\\NullValueTesting.gdb' # fgdb testing
+        roads_feature_class = '\\Roads_Edit' # fgdb testing
 
         # Open an edit session and start an edit operation
         edit = arcpy.da.Editor(database_connection)
@@ -88,7 +85,7 @@ def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
         #(for second argument, use False for unversioned data)
         # edit.startEditing ({with_undo}, {multiuser_mode})
         ## edit.startEditing(False, True) # for versioned data
-        edit.startEditing(False, False) # for unversioned data
+        edit.startEditing(False, False) # for unversioned data - fgdb testing
         edit.startOperation()
 
         # Make a layer and select cities which overlap the chihuahua polygon
@@ -108,7 +105,6 @@ def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
                 row[row_index] = None
                 row_index = row_index + 1
             cursor.updateRow(row)
-
         del cursor
         del row
         edit.stopOperation()
@@ -118,7 +114,6 @@ def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
         e = sys.exc_info()[1]
         print("NullOutSpatialValuesIfChangesFound Error: " + e.args[0])
         log_file.write("NullOutSpatialValuesIfChangesFound ERROR MESSAGE: " + e.args[0] + "\n")
-
 
 # Main function
 if __name__ == "__main__":
@@ -155,7 +150,6 @@ if __name__ == "__main__":
         log_file.write("The following SGID boundaries where checked for changes: " + str(feature_class_list) + "\n")
         log_file.write("Began at: " + str(datetime.datetime.now()) + "\n")
 
-
         # create file geodatabase for boundary changes
         changes_fgdb = arcpy.CreateFileGDB_management(projectFolder, changesFGDB)
 
@@ -168,12 +162,9 @@ if __name__ == "__main__":
         # compact the boundaries fgdb
         arcpy.Compact_management('D:/BoundaryChanges/Boundaries.gdb')
 
-
         print("Done!")
         log_file.write("Finished at: " + str(datetime.datetime.now()) + "\n")
         log_file.close()
-        # create the changed fgdb for symmetrical difference output
-        #arcpy.CreateFileGDB_management(projectFolder, changesFGDB)
     except Exception:
         e = sys.exc_info()[1]
         print(e.args[0])
