@@ -74,18 +74,19 @@ def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
             log_file.write("Did not null values in UTRANS Roads_Edit for related spatial polygon because it did not recognize the parameter: " + str(sgid_polygon_containing_edits) + "\n")
     
         ##database_connection = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde' # edit on sde EDIT version data
-        ##database_connection = 'Database Connections\gbunce@utrans.agrc.utah.gov.sde' # edit on sde my-user's version data
-        ##roads_feature_class = 'UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # edit on sde data
-        database_connection = 'D:\\BoundaryChanges\\NullValueTesting.gdb' # fgdb testing
-        roads_feature_class = '\\Roads_Edit' # fgdb testing
+        database_connection = 'Database Connections\gbunce@utrans.agrc.utah.gov.sde' # edit on sde my-user's version data
+        ##roads_feature_class = 'UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # (use for UTRANS)
+        ##database_connection = 'D:\\BoundaryChanges\\NullValueTesting.gdb' # (use for FileGeoDatabase)
+        ##roads_feature_class = '\\Roads_Edit' # (use for FileGeoDatabase)
+        roads_feature_class = '\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # (use for UTRANS)
 
         # Open an edit session and start an edit operation
         edit = arcpy.da.Editor(database_connection)
         # Edit session is started without an undo/redo stack for versioned data
         #(for second argument, use False for unversioned data)
         # edit.startEditing ({with_undo}, {multiuser_mode})
-        ## edit.startEditing(False, True) # for versioned data
-        edit.startEditing(False, False) # for unversioned data - fgdb testing
+        edit.startEditing(False, True) # for versioned data (use for UTRANS)
+        ##edit.startEditing(False, False) # for unversioned data - (use for FileGeoDatabase)
         edit.startOperation()
 
         # Make a layer and select cities which overlap the chihuahua polygon
