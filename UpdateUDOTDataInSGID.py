@@ -7,8 +7,8 @@
 
 import arcpy, os
 
-udotGDB = 'D:\UTRANS\Updates from UDOT\UDOT_LRS_April2018.gdb\\'  # UNCOMMENT LRS CODE IF YOU WANT TO UPDATE THAT FC, TOO
-sgidSDE = 'Database Connections\DC_Transportation@sgid10@sgid.agrc.utah.gov.sde\\'
+udotGDB = 'D:\\UTRANS\MonthlyUDOT_DataUpdates\\UDOT_LRS_Feb22_2019.gdb\\'  # UNCOMMENT LRS CODE IF YOU WANT TO UPDATE THAT FC, TOO
+sgidSDE = 'Database Connections\\DC_Transportation@sgid10@sgid.agrc.utah.gov.sde\\'
 
 udotMP = "UDOT_Mileposts"
 udotLRS = "UDOTRoutes_LRS"

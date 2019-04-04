@@ -130,7 +130,7 @@ arcpy.env.workspace = directory
 #### Fetch the data and bring it to D:\DataForGDrive\ #### 
 ## RoadGrinder.gdb
 #roadGrinderDatabase = "G:/Team Drives/AGRC Projects/Locators/RoadGrinder.gdb"
-roadGrinderDatabase = "R:/RoadGrinder.gdb"
+roadGrinderDatabase = "L:/roadgrinder_data/RoadGrinder.gdb"
 print "Copying RoadGrinder.gdb from Google-Team-Drive Locators folder to the DataForGDrive folder ..."
 arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
 ## UtahNG911GIS.gdb
