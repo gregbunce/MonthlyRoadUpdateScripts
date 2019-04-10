@@ -90,7 +90,7 @@ def main():
     arcpy.CalculateField_management(urban_roads_selected, field="SPEED_LMT", expression='25', expression_type='VB', code_block='')
 
     ## SPEED_LMT ##
-    print "Calculate USEEXIST fields..."
+    print "Calculate speed limits..."
     # 70 mph - UDOT limited access highway and freeways
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' OR ((DOT_RTNAME = '0201P' OR DOT_RTNAME = '0201N') and CARTOCODE = '4') OR CARTOCODE = '2'")
     arcpy.CalculateField_management(urban_roads_selected, field="SPEED_LMT", expression='70', expression_type='VB', code_block='')
@@ -137,7 +137,7 @@ def main():
 
 
     #### PART 2: Calculate Travel Cost Impedance ####
-    print "Calculate Travel Cost Impedance (Part 2)..."
+    print "Calculate Travel Cost Impedance..."
     # calculate impedance (in minutes) for all ramp-accessed roads (freeways)
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' or CARTOCODE = '2' or CARTOCODE = '4' or DOT_RTNAME like '%R%' or DOT_RTNAME like '%C%' or URBTRAFFIC = 'N'")
     arcpy.CalculateField_management(urban_roads_selected, field="IMPED_MIN", expression='([SHAPE_Length]/1609 * 60) / [SPEED_LMT]', expression_type='VB', code_block='')
@@ -149,12 +149,97 @@ def main():
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' OR ((DOT_RTNAME = '0201P' OR DOT_RTNAME = '0201N') and CARTOCODE = '4') OR CARTOCODE = '2' or CARTOCODE = '7'")
     arcpy.CalculateField_management(urban_roads_selected, field="IMPED_MIN", expression='([SHAPE_Length]/1609 * 60) / [SPEED_LMT] * 1.2', expression_type='VB', code_block='')
 
+    ## impedance needed to be be set differently for each direction on one way streets and routes. Check to see if ONE_WAY attributes for limited access freeways/highways need to be fixed
+    print "Calculate one ways..."
+    # for both directions of travel on I-215 (semi-looping), set the ONE_WAY attribute using manual selection so that all features oriented in the true direction of travel are set to 1 and the others to 2
+    # oneway codes [0 = Two way travel; 1 = One way travel in direction of arc; 2 = One way travel in opposite direction of arc]
+    # set oneway to '1'
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0215N' and DOT_F_MILE > DOT_T_MILE) or (DOT_RTNAME = '0215P' and DOT_F_MILE < DOT_T_MILE)")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='1', expression_type='VB', code_block='')
+    # set oneway to '2'
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0215N' and DOT_F_MILE < DOT_T_MILE) or (DOT_RTNAME = '0215P' and DOT_F_MILE > DOT_T_MILE)")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='2', expression_type='VB', code_block='')
+
+    ## For the positive (eastbound) travel direction for x (E-W) trending routes
+    # query the coordinate values for these selected records (using two temporary fields populated by the calculate geometry field tool), to set the ONE_WAY attribute for these selected records as follows:
+    # where x coordinate at start point is < then x coordinate at end point: set oneway = 1
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0080P' or DOT_RTNAME = '0084P' or DOT_RTNAME = '0070P' or (DOT_RTNAME = '0201P' and DOT_RTPART = '2' ) or (DOT_RTNAME = '0007P' and DOT_RTPART = '2')) and START_X < END_X")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='1', expression_type='VB', code_block='')
+    # where x coordinate at start point is > then x coordinate at end point: set oneway = 2
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0080P' or DOT_RTNAME = '0084P' or DOT_RTNAME = '0070P' or (DOT_RTNAME = '0201P' and DOT_RTPART = '2' ) or (DOT_RTNAME = '0007P' and DOT_RTPART = '2')) and START_X > END_X")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='2', expression_type='VB', code_block='')
+
+    ## For the negative (westbound) travel direction for X Trending (E-W) routes
+    # Query the coordinate values for these selected records (using two temporary fields populated by the calculate geometry field tool), to set the ONE_WAY attribute for these selected records as follows:
+    # where x coordinate at start point is > then x coordinate at end point: set oneway = 1
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0080N' or DOT_RTNAME = '0084N' or DOT_RTNAME = '0070N' or DOT_RTNAME = '0201N' or DOT_RTNAME = '0007N') and START_X > END_X")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='1', expression_type='VB', code_block='')
+    # where x coordinate at start point is < then x coordinate at end point: set oneway = 2
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0080N' or DOT_RTNAME = '0084N' or DOT_RTNAME = '0070N' or DOT_RTNAME = '0201N' or DOT_RTNAME = '0007N') and START_X < END_X")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='2', expression_type='VB', code_block='')
+
+    ## For the positive (northbound) travel direction for Y Trending (N-S) routes
+    # Query the coordinate values for these selected records (using two temporary fields populated by the calculate geometry field tool), to set the ONE_WAY attribute for these selected records as follows:
+    # where y coordinate at start point is < then y coordinate at end point: set oneway = 1
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0015P' or (DOT_RTNAME = '0152P' and DOT_RTPART ='2') or (DOT_RTNAME = '0154P' and DOT_RTPART ='2') or DOT_RTNAME = '0067P' or (DOT_RTNAME = '0189P' and DOT_RTPART ='2') or (DOT_RTNAME = '0191P' and DOT_RTPART ='2') or (DOT_RTNAME = '0089P' and (DOT_RTPART ='4' or DOT_RTPART ='7' or DOT_RTPART ='9' or DOT_RTPART ='11'))) and START_Y < END_Y")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='1', expression_type='VB', code_block='')
+    # where y coordinate at start point is > then y coordinate at end point: set oneway = 2
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0015P' or (DOT_RTNAME = '0152P' and DOT_RTPART ='2') or (DOT_RTNAME = '0154P' and DOT_RTPART ='2') or DOT_RTNAME = '0067P' or (DOT_RTNAME = '0189P' and DOT_RTPART ='2') or (DOT_RTNAME = '0191P' and DOT_RTPART ='2') or (DOT_RTNAME = '0089P' and (DOT_RTPART ='4' or DOT_RTPART ='7' or DOT_RTPART ='9' or DOT_RTPART ='11'))) and START_Y > END_Y")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='2', expression_type='VB', code_block='')
+
+    ## For the negative (southbound) travel direction for south north (y) trending routes and exception for a couple sections of us40 and us6
+    # Query the coordinate values for these selected records (using two temporary fields populated by the calculate geometry field tool), to set the ONE_WAY attribute for these selected records as follows:
+    # where y coordinate at start point is > then y coordinate at end point: set oneway = 1
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0015N' or DOT_RTNAME = '0152N' or DOT_RTNAME = '0154N' or DOT_RTNAME = '0067N' or DOT_RTNAME = '0189N' or DOT_RTNAME = '0191N ' or DOT_RTNAME = '0040N' or DOT_RTNAME = '0006N' or DOT_RTNAME = '0089N' or (DOT_RTNAME = '0040P' and DOT_RTPART ='2') or (DOT_RTNAME = '0006P' and DOT_RTPART ='3')) and START_Y > END_Y")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='1', expression_type='VB', code_block='')
+    # where y coordinate at start point is < then y coordinate at end point: set oneway = 2
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "(DOT_RTNAME = '0015N' or DOT_RTNAME = '0152N' or DOT_RTNAME = '0154N' or DOT_RTNAME = '0067N' or DOT_RTNAME = '0189N' or DOT_RTNAME = '0191N ' or DOT_RTNAME = '0040N' or DOT_RTNAME = '0006N' or DOT_RTNAME = '0089N' or (DOT_RTNAME = '0040P' and DOT_RTPART ='2') or (DOT_RTNAME = '0006P' and DOT_RTPART ='3')) and START_Y < END_Y")
+    arcpy.CalculateField_management(urban_roads_selected, field="ONEWAY", expression='2', expression_type='VB', code_block='')
 
 
+    ## Calculate the travel cost fields and then inflate the travel cost for the wrong direction of travel on one way segments by a large factor (100 x current impedance is currently used)
+    print "Calculate T_F_IMP_MIN and F_T_IMP_MIN values..."
+    # Transfer over all IMPED_MIN values to both T_F_IMP_MIN and F_T_IMP_MIN fields.
+    # clear selection 
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','CLEAR_SELECTION')
+    arcpy.CalculateField_management(urban_roads_selected, field="T_F_IMP_MIN", expression='[IMPED_MIN]', expression_type='VB', code_block='')
+    arcpy.CalculateField_management(urban_roads_selected, field="F_T_IMP_MIN", expression='[IMPED_MIN]', expression_type='VB', code_block='')
+    # Now, inflate the travel time on one ways...
+    # Select all roads where the ONEWAY attribute = 1
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "ONEWAY = '1'")
+    arcpy.CalculateField_management(urban_roads_selected, field="T_F_IMP_MIN", expression='[IMPED_MIN] * 100', expression_type='VB', code_block='')
+    # Select all roads where the ONEWAY attribute = 2
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "ONEWAY = '2'")
+    arcpy.CalculateField_management(urban_roads_selected, field="F_T_IMP_MIN", expression='[IMPED_MIN] * 100', expression_type='VB', code_block='')
 
+
+    ## Part 3 - Build the network dataset
+    # Create 2 different values for the NETSUBTYPE field so connectivity can be modeled at endpoints for limited access highways and ramps and at any vertex for other, surface streets:
+    # Query for limited access features and set NETSUBTYPE = 1 and set EXCL_WALK = ‘Y’
+    print "Calculate NETSUBTYPE values..." 
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' or CARTOCODE = '2' or CARTOCODE = '4' or DOT_RTNAME like '%R%' or DOT_RTNAME like '%C%'")
+    arcpy.CalculateField_management(urban_roads_selected, field="NETSUBTYPE", expression='1', expression_type='VB', code_block='')
+    arcpy.CalculateField_management(urban_roads_selected, field="EXCL_WALK", expression='Y', expression_type='VB', code_block='')
+    # Switch selection and set remaining records NETSUBTYPE = 2 and set EXCL_WALK = ‘N’
+    urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','SWITCH_SELECTION')
+    arcpy.CalculateField_management(urban_roads_selected, field="NETSUBTYPE", expression='2', expression_type='VB', code_block='')
+    arcpy.CalculateField_management(urban_roads_selected, field="EXCL_WALK", expression='N', expression_type='VB', code_block='')
 
     # clean up resources and memory
     arcpy.Delete_management('network_roads_lyr')
+
+    # create ‘Subtypes’ to define the two geodatabase subtypes using the NETSUBTYPE field
+    # Code: "1" || Description "Limited Access & Ramps"
+    # Code: "2" || Description "Other"
+    print "Create SUBTYPES for Limited Access & Ramps and Other..." 
+    arcpy.SetSubtypeField_management(network_roads, field="NETSUBTYPE", clear_value="false")
+    arcpy.AddSubtype_management(network_roads, subtype_code="1", subtype_description="Limited Access & Ramps")
+    arcpy.AddSubtype_management(network_roads, subtype_code="2", subtype_description="Other")
+
+    # build the netork based on an existing network .xml file template
+     
+
+
 
     ## create a feature class in the fgdb
     #network_roads = arcpy.CreateFeatureclass_management(network_fgdb, "Roads", "POLYLINE", 
