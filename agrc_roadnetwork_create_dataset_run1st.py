@@ -1,4 +1,4 @@
-import arcpy
+ï»¿import arcpy
 import datetime
 import time
 import os
@@ -40,7 +40,7 @@ def main():
 
     # import the sgid roads fc
     print "Importing SGID Roads ..."
-    expression = "ZIPCODE_L = '84763'" ##TESTING STUFF##
+    expression = "ZIPCODE_L in ('84108', '84106', '84105')" ##TESTING STUFF##
     network_roads = arcpy.FeatureClassToFeatureClass_conversion(sgid_roads, str(network_fgdb) + r'/NetworkDataset', 'Roads', expression)
 
     ## add the needed fields ##
@@ -215,12 +215,12 @@ def main():
 
     ## Part 3 - Build the network dataset
     # Create 2 different values for the NETSUBTYPE field so connectivity can be modeled at endpoints for limited access highways and ramps and at any vertex for other, surface streets:
-    # Query for limited access features and set NETSUBTYPE = 1 and set EXCL_WALK = ‘Y’
+    # Query for limited access features and set NETSUBTYPE = 1 and set EXCL_WALK = Â‘YÂ’
     print "Calculate NETSUBTYPE values..." 
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' or CARTOCODE = '2' or CARTOCODE = '4' or DOT_RTNAME like '%R%' or DOT_RTNAME like '%C%'")
     arcpy.CalculateField_management(urban_roads_selected, field="NETSUBTYPE", expression='1', expression_type='VB', code_block='')
     arcpy.CalculateField_management(urban_roads_selected, field="EXCL_WALK", expression='Y', expression_type='VB', code_block='')
-    # Switch selection and set remaining records NETSUBTYPE = 2 and set EXCL_WALK = ‘N’
+    # Switch selection and set remaining records NETSUBTYPE = 2 and set EXCL_WALK = Â‘NÂ’
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','SWITCH_SELECTION')
     arcpy.CalculateField_management(urban_roads_selected, field="NETSUBTYPE", expression='2', expression_type='VB', code_block='')
     arcpy.CalculateField_management(urban_roads_selected, field="EXCL_WALK", expression='N', expression_type='VB', code_block='')
@@ -228,7 +228,7 @@ def main():
     # clean up resources and memory
     arcpy.Delete_management('network_roads_lyr')
 
-    # create ‘Subtypes’ to define the two geodatabase subtypes using the NETSUBTYPE field
+    # create Â‘SubtypesÂ’ to define the two geodatabase subtypes using the NETSUBTYPE field
     # Code: "1" || Description "Limited Access & Ramps"
     # Code: "2" || Description "Other"
     print "Create SUBTYPES for Limited Access & Ramps and Other..." 
@@ -237,21 +237,10 @@ def main():
     arcpy.AddSubtype_management(network_roads, subtype_code="2", subtype_description="Other")
 
     # build the netork based on an existing network .xml file template
-     
+    ## this is done in a seperate script b/c it needs to be run in Desktop 10.6 (or higher) or Pro
+    ## use this script: "agrc_roadnetwork_create_and_build_network_run2nd.py"
 
 
-
-    ## create a feature class in the fgdb
-    #network_roads = arcpy.CreateFeatureclass_management(network_fgdb, "Roads", "POLYLINE", 
-    #                                    'D:/NetworkDataset/networkdataset_roads_template.gdb/Roads_template', "DISABLED", "DISABLED", 
-    #                                    sgid_roads)
-
-    ## TO DO ##
-    # calculate geometry on the start/end x/y fields
-
-
-    # import the roads into network dataset
-    ## import_RoadsIntoNetworkDataset(sgid_roads, network_roads)
 
 
 
