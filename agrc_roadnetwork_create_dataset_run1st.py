@@ -40,7 +40,8 @@ def main():
 
     # import the sgid roads fc
     print "Importing SGID Roads ..."
-    expression = "ZIPCODE_L in ('84108', '84106', '84105')" ##TESTING STUFF##
+    #expression = "ZIPCODE_L in ('84108', '84106', '84105')" ##TESTING STUFF##
+    expression = ""
     network_roads = arcpy.FeatureClassToFeatureClass_conversion(sgid_roads, str(network_fgdb) + r'/NetworkDataset', 'Roads', expression)
 
     ## add the needed fields ##
