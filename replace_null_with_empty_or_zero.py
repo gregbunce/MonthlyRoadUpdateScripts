@@ -39,6 +39,8 @@ def formatFeatureClass(FC):
     arcpy.CalculateField_management(FC,"ALIAS2_TYP","RemoveNullString(!ALIAS2_TYP!)","PYTHON", str(inspect.getsource(RemoveNullString)))
     arcpy.CalculateField_management(FC,"S_NAME","RemoveNullString(!S_NAME!)","PYTHON", str(inspect.getsource(RemoveNullString)))
     arcpy.CalculateField_management(FC,"PRE_DIR","RemoveNullString(!PRE_DIR!)","PYTHON", str(inspect.getsource(RemoveNullString)))
+    arcpy.CalculateField_management(FC,"S_TYPE","RemoveNullString(!S_TYPE!)","PYTHON", str(inspect.getsource(RemoveNullString)))
+    arcpy.CalculateField_management(FC,"ACS_ALIAS","RemoveNullString(!ACS_ALIAS!)","PYTHON", str(inspect.getsource(RemoveNullString)))
 
     arcpy.CalculateField_management(FC,"SPD_LMT","RemoveNullInt(!SPD_LMT!)","PYTHON", str(inspect.getsource(RemoveNullInt)))
     arcpy.CalculateField_management(FC,"L_F_ADD","RemoveNullInt(!L_F_ADD!)","PYTHON", str(inspect.getsource(RemoveNullInt)))
