@@ -133,6 +133,7 @@ arcpy.env.workspace = directory
 roadGrinderDatabase = "L:/roadgrinder_data/RoadGrinder.gdb"
 print "Copying RoadGrinder.gdb from Google-Team-Drive Locators folder to the DataForGDrive folder ..."
 arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
+
 ## UtahNG911GIS.gdb
 ng911Database = "L:/agrc/data/ng911/UtahNG911GIS.gdb"
 
