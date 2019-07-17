@@ -1,6 +1,8 @@
 import arcpy
 import datetime
 
+## notes before running this script: Make sure the 'workspace' is location for the roads you want:  Update the "Roads" layer in the workspace and remove the output tables
+
 # get date variables
 now = datetime.datetime.now()
 year = now.year
@@ -20,7 +22,8 @@ file = open(text_file_path, "a")
 workspace = r'D:\UTRANS\UpdateMilepostsInRoads_Edit\testing.gdb'
 roads_fc = r'D:\UTRANS\UpdateMilepostsInRoads_Edit\testing.gdb\Roads'
 lrs_fc = r'D:\UTRANS\UpdateMilepostsInRoads_Edit\testing.gdb\UDOTRoutes_LRS'
-
+table_output_from_verts = "D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_from_verts"
+table_output_to_verts = "D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_to_verts"
 
 def null_existing_mileposts():
     nulled_out_from = 0
@@ -65,40 +68,46 @@ def get_milepost_values():
     # locate features along route
     ## this is for road line features but it only honors the direction of the LRS and not the road arc direction.  table_output = arcpy.LocateFeaturesAlongRoutes_lr("roads_dot_rtname_lyr", lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/locate_feat_output", out_event_properties="RID LINE FMEAS TMEAS", route_locations="FIRST", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="NO_M_DIRECTION")
     # table_output = r"D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/locate_feat_output"
-    table_output_from_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_from_verts_lyr", in_routes="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/UDOTRoutes_LRS", route_id_field="LABEL", radius_or_tolerance="1 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_from_verts", out_event_properties="RID POINT MEAS", route_locations="FIRST", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
-    table_output_to_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_to_verts_lyr", in_routes="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/UDOTRoutes_LRS", route_id_field="LABEL", radius_or_tolerance="1 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_to_verts", out_event_properties="RID POINT MEAS", route_locations="FIRST", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")    
+    table_output_from_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_from_verts_lyr", in_routes="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/UDOTRoutes_LRS", route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_from_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
+    table_output_to_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_to_verts_lyr", in_routes="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/UDOTRoutes_LRS", route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_to_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")    
 
-    arcpy.MakeTableView_management(table_output_from_verts, "from_table_view")
-    arcpy.MakeTableView_management(table_output_to_verts, "to_table_view")
-
-
-
-def field_calculate_milepost_values_to_roads():
-    # join the output table to the roads data
-    print "Begin Joining tables at: " + str(datetime.datetime.now())
-    file.write("\n" + "Begin Joining tables at: " + str(datetime.datetime.now()))
-    arcpy.MakeFeatureLayer_management(roads_fc, "roads_lyr")
-    joined_tables = arcpy.AddJoin_management(in_layer_or_view="roads_lyr", in_field="UNIQUE_ID", join_table="table_view", join_field="UNIQUE_ID", join_type="KEEP_COMMON")  
-    print "Finished Joining tables at: " + str(datetime.datetime.now())
-    file.write("\n" + "Finished Joining tables at: " + str(datetime.datetime.now()))
-
-    # begin edit session and calc over the fields
-    #with arcpy.da.Editor(workspace) as edit:
-    print "Begin Calculating over values at: " + str(datetime.datetime.now())
-    file.write("\n" + "Begin Calculating over values at: " + str(datetime.datetime.now()))
-    # make feature layer of joined tables
-    arcpy.MakeFeatureLayer_management(joined_tables, "joined_feat_lyr")
-    arcpy.CalculateField_management("joined_feat_lyr", "Roads.DOT_F_MILE", "!locate_feat_output.FMEAS!", "PYTHON")
-    print "done calc'ing mp froms-values, begin calc'ing to-values"
-    arcpy.CalculateField_management("joined_feat_lyr", "Roads.DOT_T_MILE", "!locate_feat_output.TMEAS!", "PYTHON")
-    print "Finished Calculating over values at: " + str(datetime.datetime.now())
-    file.write("\n" + "Finished Calculating over values at: " + str(datetime.datetime.now()))
     print "Finished Locating Features Along Route at: " + str(datetime.datetime.now())
     file.write("\n" + "Finished Locating Features Along Route at: " + str(datetime.datetime.now()))
+
+
+def field_calculate_milepost_values_to_roads(table_output):
+    print str(table_output)
+    # make table view from locate-features-along-routes output tables
+    arcpy.MakeTableView_management(table_output, "table_view")
+    
+    # join the output table to the roads data
+    print "Begin table join at: " + str(datetime.datetime.now())
+    file.write("\n" + "Begin table join at: " + str(datetime.datetime.now()))
+    arcpy.MakeFeatureLayer_management(roads_fc, "roads_lyr")
+    joined_tables = arcpy.AddJoin_management(in_layer_or_view="roads_lyr", in_field="UNIQUE_ID", join_table="table_view", join_field="UNIQUE_ID", join_type="KEEP_COMMON")  
+    print "Finished table join at: " + str(datetime.datetime.now())
+    file.write("\n" + "Finished table join at: " + str(datetime.datetime.now()))
+
+    print "Begin Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now())
+    file.write("\n" + "Begin Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now()))
+    # make feature layer of joined tables
+    arcpy.MakeFeatureLayer_management(joined_tables, "joined_feat_lyr")
+    
+    if str(table_output) == "D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_from_verts":
+        arcpy.CalculateField_management("joined_feat_lyr", "Roads.DOT_F_MILE", "!out_table_from_verts.MEAS!", "PYTHON")
+    
+    if str(table_output) == "D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/out_table_to_verts":
+        arcpy.CalculateField_management("joined_feat_lyr", "Roads.DOT_T_MILE", "!out_table_to_verts.MEAS!", "PYTHON")
+
+    print "Finished Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now())
+    file.write("\n" + "Finished Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now()))
+    
     
     # remove join
     arcpy.RemoveJoin_management("roads_lyr")
-
+    arcpy.Delete_management("table_view")
+    arcpy.Delete_management("joined_feat_lyr")
+    arcpy.Delete_management("roads_lyr")
 
 def import_sgid_roads_and_lrs_into_fgdb():
     file.write("Began importing roads and lrs into testing lrs fgdb at: " + str(datetime.datetime.now()))
@@ -116,7 +125,8 @@ if __name__ == "__main__":
         with arcpy.da.Editor(workspace) as edit:
             #null_existing_mileposts()
             get_milepost_values()
-            #field_calculate_milepost_values_to_roads()
+            #field_calculate_milepost_values_to_roads(table_output_from_verts)
+            #field_calculate_milepost_values_to_roads(table_output_to_verts)
 
         # finished
         file.write("\n" + "Finished Assign Mileposts to Roads at: " + str(datetime.datetime.now()))
