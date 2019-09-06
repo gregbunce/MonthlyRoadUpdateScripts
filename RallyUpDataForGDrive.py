@@ -118,7 +118,7 @@ month = now.month
 day = now.day
 folder_name = str(year) + "_" + str(month) + "_" + str(day)
 # create the folder
-directory = "D:/DataForGDrive/" + folder_name
+directory = "C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive\\" + folder_name
 if not os.path.exists(directory):
     print "Creating Directory: " + str(directory) + " ..."
     os.makedirs(directory)
@@ -127,21 +127,20 @@ else:
 # set this folder as the work env
 arcpy.env.workspace = directory
 
-#### Fetch the data and bring it to D:\DataForGDrive\ #### 
+#### Fetch the data and bring it to C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive\\ #### 
 ## RoadGrinder.gdb
 #roadGrinderDatabase = "G:/Team Drives/AGRC Projects/Locators/RoadGrinder.gdb"
-roadGrinderDatabase = "L:/roadgrinder_data/RoadGrinder.gdb"
-print "Copying RoadGrinder.gdb from Google-Team-Drive Locators folder to the DataForGDrive folder ..."
+roadGrinderDatabase = "C:/Temp/RoadGrinder.gdb"
+print "Copying RoadGrinder.gdb from c:/temp folder to the DataForGDrive folder ..."
 arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
 
 ## UtahNG911GIS.gdb
 ng911Database = "L:/agrc/data/ng911/UtahNG911GIS.gdb"
-
-print "Copying UtahNG911GIS.gdb from Google-Team-Drive NG911 folder to the DataForGDrive folder ..."
+print "Copying UtahNG911GIS.gdb from agrc-share ng911 folder to the DataForGDrive folder ..."
 arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
 
 ## Roads.gdb
-sgidRoads = r"Database Connections\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\SGID10.TRANSPORTATION.Roads"
+sgidRoads = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.TRANSPORTATION.Roads"
 arcpy.CreateFileGDB_management(directory, "Roads.gdb")
 print "Importing SGID.Roads into Road.gdb ..."
 arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
@@ -151,20 +150,20 @@ print "Importing SGID.Roads into Road.shp ..."
 arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
 
 ## AGRC_AddressPointLocator.gcpk
-addressPntLocatorPackage = "D:/Rebuild Address Locators/AGRC_AddressPointLocator.gcpk"
-print "Copying AGRC_AddressPointLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
+addressPntLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_AddressPointLocator.gcpk"
+print "Copying AGRC_AddressPointLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
 arcpy.Copy_management(addressPntLocatorPackage, "AGRC_AddressPointLocator.gcpk")
 
 
 ## AGRC_RoadsLocator.gcpk
-roadsLocatorPackage = "D:/Rebuild Address Locators/AGRC_RoadsLocator.gcpk"
-print "Copying AGRC_RoadsLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
+roadsLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_RoadsLocator.gcpk"
+print "Copying AGRC_RoadsLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
 arcpy.Copy_management(roadsLocatorPackage, "AGRC_RoadsLocator.gcpk")
 
 
 ## AGRC_CompositeLocator.gcpk
-compositeLocatorPackage = "D:/Rebuild Address Locators/AGRC_CompositeLocator.gcpk"
-print "Copying AGRC_CompositeLocator.gcpk from D:\Rebuild Address Locators to the DataForGDrive folder ..."
+compositeLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_CompositeLocator.gcpk"
+print "Copying AGRC_CompositeLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
 arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
 
 
@@ -180,7 +179,4 @@ ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
 # zip the locator packages
 ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")
 
-
-
-
-
+print "Done!"

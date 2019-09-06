@@ -1,13 +1,13 @@
 import arcpy, shutil, os
 
 # variables
-rebuildLocators_Folder = 'D:/Rebuild Address Locators'
-previousRebuildLocators_Folder = 'D:/Rebuild Address Locators/_previousRebuild'
+rebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators'
+previousRebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\_previousRebuild'
 #hnasLocators_Folder = 'K:/AGRC Projects/Locators'
-hnasLocators_Folder = r'M:\Shared drives\AGRC Projects\Locators'
+hnasLocators_Folder = 'G:\\Shared drives\\AGRC Projects\\Locators'
 #previousHnasLocators_Folder = 'K:/AGRC Projects/Locators/PreviousLocators'
-previousHnasLocators_Folder = r'M:\Shared drives\AGRC Projects\Locators\_previousRebuild'
-sgidAddressPoints = r"Database Connections\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\SGID10.LOCATION.AddressPoints"
+previousHnasLocators_Folder = 'G:\\Shared drives\\AGRC Projects\\Locators\\_previousRebuild'
+sgidAddressPoints = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.LOCATION.AddressPoints"
 addressPointLocator = "AGRC_AddressPointLocator"
 roadsLocator = "AGRC_RoadsLocator"
 compositeLocator = "AGRC_CompositeLocator"
@@ -15,10 +15,10 @@ arcpy.env.workspace = rebuildLocators_Folder
 
 #### Move all existing files in rebuild folder to the backup folder. ####
 # delete all files in the backup folder
-print "Deleting the folder and all the files >>> D:/Rebuild Address Locators/_previousRebuild..."
+print "Deleting the folder and all the files >>> C:\Users\gbunce\Documents\projects\RebuildAddressLocators\_previousRebuild..."
 shutil.rmtree(previousRebuildLocators_Folder)
 # create the folder again
-print "Recreating the empty directory D:/Rebuild Address Locators/_previousRebuild..."
+print "Recreating the empty directory C:\Users\gbunce\Documents\projects\RebuildAddressLocators\_previousRebuild..."
 os.makedirs(previousRebuildLocators_Folder)
 
 files = os.listdir(rebuildLocators_Folder)
@@ -62,20 +62,20 @@ arcpy.PackageLocator_geocoding(compositeLocator, compositeLocator + '.gcpk', "CO
 ##################################################################################################
 #### move the old locators, packages, and gdb to the _previous folder on hnas ####
 # delete all files in the backup folder
-print "Deleting the folder and all the files >>> M:/Shared drives/AGRC Projects/Locators/PreviousLocators ..."
+print "Deleting the folder and all the files >>> G:/Shared drives/AGRC Projects/Locators/PreviousLocators ..."
 shutil.rmtree(previousHnasLocators_Folder)
 # create the folder again
-print "Recreating the empty directory M:/Shared drives/AGRC Projects/Locators/PreviousLocators ..."
+print "Recreating the empty directory G:/Shared drives/AGRC Projects/Locators/PreviousLocators ..."
 os.makedirs(previousHnasLocators_Folder)
 
 # copy the rebuilt locators, locator packages, and new roadgrinder.gdb to hnas
 files = os.listdir(hnasLocators_Folder)
-print "Moving existing files in M:/Shared drives/AGRC Projects/Locators to M:/Shared drives/AGRC Projects/Locators/PreviousLocators ..."
+print "Moving existing files in G:/Shared drives/AGRC Projects/Locators to G:/Shared drives/AGRC Projects/Locators/PreviousLocators ..."
 for f in files:
     shutil.move(hnasLocators_Folder+ "/" + f, previousHnasLocators_Folder)
 
-### Copy contents from rebuild folders to M:/Shared drives/AGRC Projects/Locators
-print "Copying files from D:/Rebuild Address Locators to M:/Shared drives/AGRC Projects/Locators ..."
+### Copy contents from rebuild folders to G:/Shared drives/AGRC Projects/Locators
+print "Copying files from D:/Rebuild Address Locators to G:/Shared drives/AGRC Projects/Locators ..."
 arcpy.Copy_management("/RoadGrinder.gdb", hnasLocators_Folder + "/RoadGrinder.gdb")
 arcpy.Copy_management(addressPointLocator, hnasLocators_Folder + "/" + addressPointLocator)
 arcpy.Copy_management(roadsLocator, hnasLocators_Folder + "/" + roadsLocator)

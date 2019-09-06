@@ -130,10 +130,10 @@ if __name__ == "__main__":
         formatted_date_with_time = str(year) + "mon" + str(month) + "d" + str(day) + "h" + str(hour) + "min" + str(min)
 
         # data paths
-        arcpy.env.workspace = 'D:/BoundaryChanges/Boundaries.gdb'
+        arcpy.env.workspace = 'C:/Users/gbunce/Documents/projects/BoundaryChanges/Boundaries.gdb'
         boundaryFGDB = 'Boundaries.gdb'
         changesFGDB = 'Changes_' + formatted_date + '.gdb'
-        projectFolder = 'D:/BoundaryChanges'
+        projectFolder = 'C:/Users/gbunce/Documents/projects/BoundaryChanges'
         sgid_connection = 'Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.'
 
         # datasets
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         GetBoundaryUpdates_Count()
 
         # compact the boundaries fgdb
-        arcpy.Compact_management('D:/BoundaryChanges/Boundaries.gdb')
+        arcpy.Compact_management('C:/Users/gbunce/Documents/projects/BoundaryChanges/Boundaries.gdb')
 
         print("Done!")
         log_file.write("Finished at: " + str(datetime.datetime.now()) + "\n")

@@ -9,7 +9,7 @@ import os
 #today = date.today()
 #strDate = str(today.month).zfill(2) + str(today.day).zfill(2) +  str(today.year) 
 
-sgid_roads = r"Database Connections\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\SGID10.TRANSPORTATION.Roads"
+sgid_roads = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.TRANSPORTATION.Roads"
 
 # main function
 def main():
@@ -22,7 +22,7 @@ def main():
     folder_name = str(year) + "_" + str(month) + "_" + str(day)
     # create the folder
     print "Creating Directory..."
-    directory = "D:/NetworkDataset/RecentBuilds/" + folder_name
+    directory = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\" + folder_name
     if not os.path.exists(directory):
         print "Creating Directory: " + str(directory) + " ..."
         os.makedirs(directory)
@@ -240,7 +240,7 @@ def main():
     # build the netork based on an existing network .xml file template
     ## this is done in a seperate script b/c it needs to be run in Desktop 10.6 (or higher) or Pro
     ## use this script: "agrc_roadnetwork_create_and_build_network_run2nd.py"
-
+    print "Done!"
 
 
 
