@@ -26,15 +26,20 @@ file = open(text_file_path, "a")
 # global variables
 local_workspace = 'C:\\Users\\gbunce\Documents\\projects\\UTRANS\\UpdateMilepostsInRoads_Edit\\2019_08_07.gdb'
 arcpy.env.workspace = 'C:\\Users\\gbunce\Documents\\projects\\UTRANS\\UpdateMilepostsInRoads_Edit\\2019_08_07.gdb'
-roads_fc = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # make fullpath to utrans
+#roads_fc = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # make fullpath to utrans
+roads_fc = 'Database Connections\\TestingConnection@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit'
 lrs_fc ='UDOTRoutes_LRS'
-utrans_conn = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde'
+#utrans_conn = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde'
+utrans_conn = 'Database Connections\\TestingConnection@utrans.agrc.utah.gov.sde'
 table_output_from_verts = "out_table_from_verts"
 table_output_to_verts = "out_table_to_verts"
 
+
+#: null out existing mileposts
 def null_existing_mileposts():
     nulled_out_from = 0
     nulled_out_to = 0
+    my_counter = 0
 
     edit = arcpy.da.Editor(utrans_conn)
     edit.startEditing(False, True)
@@ -50,6 +55,7 @@ def null_existing_mileposts():
     fields    = ("DOT_F_MILE", "DOT_T_MILE")
     with arcpy.da.UpdateCursor(roads_fc, fields) as cursor:
             for row in cursor:
+                my_counter = my_counter + 1
                 if row[0]>=0:
                     row[0] = None
                     nulled_out_from = nulled_out_from + 1
@@ -57,6 +63,7 @@ def null_existing_mileposts():
                     row[1] = None
                     nulled_out_to = nulled_out_to + 1
                 cursor.updateRow(row)
+                print 'Still nulling out records.  On record number ' + str(my_counter) + '. So far we have nulled out ' + str(nulled_out_from) +  ' mileposts.'
     print "Finished nulling out milepost fields at " + str(datetime.datetime.now())
     print "nulled out mp from-values: " + str(nulled_out_from)
     print "nulled out mp to-values: " + str(nulled_out_to)
@@ -70,7 +77,7 @@ def null_existing_mileposts():
     edit.stopEditing(True)
 
 
-
+#: Create milepost tables using the 'Feature Vertices To Points" GP tool (getting the 'start' and 'end' of each segment)
 def create_new_milepost_values_tables():
     print "Begin Locate Features Along Route at: " + str(datetime.datetime.now())
     file.write("\n" + "\n" + "Begin Locate Features Along Route at: " + str(datetime.datetime.now()))
@@ -152,12 +159,21 @@ if __name__ == "__main__":
 
         # start and edit session and call functions that perform edits
         #with arcpy.da.Editor(local_workspace) as edit:
+        
+        #: 1. Null out existing mileposts.
+        print("Begin nulling out existing mileposts at ..." + str(datetime.datetime.now()))
         null_existing_mileposts()
+
+        #: 2. Create new milepost tables.
+        print("Begin creating the new milepost tables at ..." + str(datetime.datetime.now()))
         create_new_milepost_values_tables()
+
+        #: 3. Calculate the new milepost values from the tables to the feature class
+        print("Begin calculating the new mileposts from the table to the feature class at ..." + str(datetime.datetime.now()))
         field_calculate_milepost_values_to_roads(table_output_from_verts)
         field_calculate_milepost_values_to_roads(table_output_to_verts)
 
-        # finished
+        #: Finished.
         file.write("\n" + "Finished Assign Mileposts to Roads at: " + str(datetime.datetime.now()))
         print "Finished Assign Mileposts to Roads at: " + str(datetime.datetime.now())
         elapsed_time = (time.time() - start_time) / 60 # divide by 60 to get mins (it's in secs)
