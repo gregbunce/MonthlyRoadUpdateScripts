@@ -1,11 +1,15 @@
+import sys
 import arcpy
 import datetime
 import time
 from arcpy import env
 
-## notes before running this script: Make sure the 'local_workspace' is location for the intermediate data and the LRS.
-## Create a new local_workspace with today's date
-## Import the UDOTRoutes_LRS layer
+'''
+Notes before running this script:
+1. Make sure the 'local_workspace' is location for the intermediate data is correct and the LRS layer is contained in there.  There's a function to import it, if needed.
+2. Create a new local_workspace with today's date
+3. Import the UDOTRoutes_LRS layer - there is a function call for this the 'Main'.
+'''
 
 # get date variables
 now = datetime.datetime.now()
@@ -35,7 +39,7 @@ table_output_from_verts = "out_table_from_verts"
 table_output_to_verts = "out_table_to_verts"
 
 
-#: null out existing mileposts
+#: Function to null out existing mileposts
 def null_existing_mileposts():
     nulled_out_from = 0
     nulled_out_to = 0
@@ -48,12 +52,13 @@ def null_existing_mileposts():
     #with arcpy.da.Editor(utrans_conn) as edit:
     # start edit session and operation
     #with arcpy.da.Editor(local_workspace) as edit:
-    
-    # null out the milepost values where "DOT_F_MILE >= 0 or DOT_T_MILE >= 0"
+
+    # Begin nulling out the milepost values where "DOT_F_MILE >= 0 or DOT_T_MILE >= 0"
     print "Begin nulling out milepost fields at " + str(datetime.datetime.now())
     file.write("\n" + "\n" + "Began nulling out existing mileposts at: " + str(datetime.datetime.now()))
-    fields    = ("DOT_F_MILE", "DOT_T_MILE")
-    with arcpy.da.UpdateCursor(roads_fc, fields) as cursor:
+    fields = ["DOT_F_MILE", "DOT_T_MILE"]
+    where_cluase = 'DOT_F_MILE >= 0 or DOT_T_MILE >= 0'
+    with arcpy.da.UpdateCursor(roads_fc, fields, where_cluase) as cursor:
             for row in cursor:
                 my_counter = my_counter + 1
                 if row[0]>=0:
@@ -64,6 +69,8 @@ def null_existing_mileposts():
                     nulled_out_to = nulled_out_to + 1
                 cursor.updateRow(row)
                 print 'Still nulling out records.  On record number ' + str(my_counter) + '. So far we have nulled out ' + str(nulled_out_from) +  ' mileposts.'
+
+    #: Finished nulling out values.
     print "Finished nulling out milepost fields at " + str(datetime.datetime.now())
     print "nulled out mp from-values: " + str(nulled_out_from)
     print "nulled out mp to-values: " + str(nulled_out_to)
@@ -77,12 +84,12 @@ def null_existing_mileposts():
     edit.stopEditing(True)
 
 
-#: Create milepost tables using the 'Feature Vertices To Points" GP tool (getting the 'start' and 'end' of each segment)
+#: Function to create milepost tables using the 'Feature Vertices To Points" GP tool (getting the 'start' and 'end' of each segment)
 def create_new_milepost_values_tables():
     print "Begin Locate Features Along Route at: " + str(datetime.datetime.now())
     file.write("\n" + "\n" + "Begin Locate Features Along Route at: " + str(datetime.datetime.now()))
     # create a feature layer of roads to use only features that have a "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')"
-    arcpy.MakeFeatureLayer_management(roads_fc, "roads_dot_rtname_lyr", "CHAR_LENGTH(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')")
+    arcpy.MakeFeatureLayer_management(roads_fc, "roads_dot_rtname_lyr", "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')")
 
     # feature vertices to points to get the start/from points and the end/to points for the roads data
     road_from_vertices = arcpy.FeatureVerticesToPoints_management("roads_dot_rtname_lyr", local_workspace + "/Roads_FromVert", point_location="START")
@@ -101,74 +108,118 @@ def create_new_milepost_values_tables():
 
 
 
+#: Function to calculate over the milepost values from the fgdb temp tables to the UTRANS Roads feature class.
 def field_calculate_milepost_values_to_roads(table_output):
+    #: Fully qualify the field names.
+    #arcpy.env.qualifiedFieldNames = True
+
     #print "Begin table join at: " + str(datetime.datetime.now())
     #file.write("\n" + "\n" + "Begin table join at: " + str(datetime.datetime.now()))
 
-    # make table view from locate-features-along-routes output tables
+    # make table view from locate-features-along-routes output tables (only use rows where RID = DOT_RTNAME)
     arcpy.MakeTableView_management(table_output, "table_view", "RID = DOT_RTNAME")
     
-    # join the output table to the roads data
-    arcpy.MakeFeatureLayer_management(roads_fc, "roads_lyr")
-    joined_tables = arcpy.AddJoin_management(in_layer_or_view="roads_lyr", in_field="UNIQUE_ID", join_table="table_view", join_field="UNIQUE_ID", join_type="KEEP_COMMON")  
-    #print "Finished table join at: " + str(datetime.datetime.now())
-    #file.write("Finished table join at: " + str(datetime.datetime.now()))
+    # # join the output table to the roads data
+    # arcpy.MakeFeatureLayer_management(roads_fc, "roads_lyr")
+    # print("Begin joining the milepost table to the UTRANS feature class at ... "+ str(datetime.datetime.now()))
+    # joined_tables = arcpy.AddJoin_management(in_layer_or_view="roads_lyr", in_field="UNIQUE_ID", join_table="table_view", join_field="UNIQUE_ID", join_type="KEEP_COMMON")  
+    # #print "Finished table join at: " + str(datetime.datetime.now())
+    # #file.write("Finished table join at: " + str(datetime.datetime.now()))
 
-    print "Begin Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now())
-    file.write("\n" + "\n" + "Begin Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now()))
-    # make feature layer of joined tables
-    arcpy.MakeFeatureLayer_management(joined_tables, "joined_feat_lyr")
-    
+    # print "Begin Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now())
+    # file.write("\n" + "\n" + "Begin Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now()))
+    # # make feature layer of joined tables
+    # arcpy.MakeFeatureLayer_management(joined_tables, "joined_feat_lyr")
+
     edit = arcpy.da.Editor(utrans_conn)
     edit.startEditing(False, True)
     edit.startOperation()
 
-    #with arcpy.da.Editor(utrans_conn) as edit:
-    if str(table_output) == "out_table_from_verts":
-        arcpy.CalculateField_management("joined_feat_lyr", "Roads.DOT_F_MILE", "!out_table_from_verts.MEAS!", "PYTHON")
-    
-    if str(table_output) == "out_table_to_verts":
-        arcpy.CalculateField_management("joined_feat_lyr", "Roads.DOT_T_MILE", "!out_table_to_verts.MEAS!", "PYTHON")
+    #: Option A - Using Field Calcuator (I was having issues with this option so for now, I'm using Option B).
+    # if str(table_output) == "out_table_from_verts":
+    #     arcpy.CalculateField_management("joined_feat_lyr", "UTRANS.TRANSADMIN.Roads_Edit.DOT_F_MILE", "!out_table_from_verts.MEAS!", "PYTHON")
 
-    print "Finished Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now())
-    file.write("\n" + "Finished Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now()))
-    
+    # if str(table_output) == "out_table_to_verts":
+    #     arcpy.CalculateField_management("joined_feat_lyr", "UTRANS.TRANSADMIN.Roads_Edit.DOT_T_MILE", "!out_table_to_verts.MEAS!", "PYTHON")
+
+    # print "Finished Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now())
+    # file.write("\n" + "Finished Calculating over values from " + str(table_output) + " at: " + str(datetime.datetime.now()))
+
+
+    #: Option B - Using Update Cursor.
+    # fields = ["UTRANS.TRANSADMIN.Roads_Edit.DOT_F_MILE", "!out_table_to_verts.MEAS!"]
+    # with arcpy.da.UpdateCursor("joined_feat_lyr", fields) as cursor:
+    #         for row in cursor:
+    #             print(str(row[0]) + " " + str(row[1]))
+    #             my_counter = my_counter + 1
+    #             row[0] = row[1]
+    #             cursor.updateRow(row)
+    #             print('Calculated over ' + str(my_counter) + ' values so far.')
+
+
+    #: Option C - Use dictionary method.
+    # Create a dictionary of values from the milepost table and then use that in an UpdateCursor to update Roads_Edit.
+    my_dict = {}
+    my_counter = 0
+    milepost_field = ''
+
+    #: Populate the python dictionary with values from the apporpriate milepost gp-tool output table.
+    with arcpy.da.SearchCursor('table_view', ['UNIQUE_ID', 'MEAS']) as cur:
+        for row in cur:
+            my_dict[row[0]] = row[1]
+
+    #: Use update cursor and python dictionary to update the Roads_Edit milepost fields
+    if str(table_output) == "out_table_from_verts":
+        milepost_field = 'DOT_F_MILE'
+    if str(table_output) == "out_table_to_verts":
+        milepost_field = 'DOT_T_MILE'
+    fields = ["UNIQUE_ID", milepost_field]
+
+    with arcpy.da.UpdateCursor(roads_fc, fields) as cursor:
+            for row in cursor:
+                my_counter = my_counter + 1
+                if row[0] in my_dict:
+                    row[1] = my_dict[row[0]]
+                cursor.updateRow(row)
+                print "Updated " + str(my_counter) + " " + milepost_field + " recoreds so far.  Still updating..." 
+
+    print "Finished updating the Roads_Edit milepost field " + milepost_field +  " with " + str(my_counter) + " new milepost records."
+
     edit.stopOperation()
     edit.stopEditing(True)
 
     # remove join and delete temp-layers
-    arcpy.RemoveJoin_management("roads_lyr")
+    #arcpy.RemoveJoin_management("roads_lyr")
     arcpy.Delete_management("table_view")
-    arcpy.Delete_management("joined_feat_lyr")
-    arcpy.Delete_management("roads_lyr")
+    #arcpy.Delete_management("joined_feat_lyr")
+    #arcpy.Delete_management("roads_lyr")
 
 
-def import_sgid_roads_and_lrs_into_fgdb():
-    print "import sgid roads and lrs data into fgdb"
-    file.write("\n" + "\n" + "Began importing roads and lrs into testing lrs fgdb at: " + str(datetime.datetime.now()))
-    arcpy.FeatureClassToGeodatabase_conversion(Input_Features="'Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.TRANSPORTATION.UDOTRoutes_LRS';'Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.TRANSPORTATION.Roads'", Output_Geodatabase=workspace)
+#: Use this function if you want to import the SGID roads and LRS into a testing fgdb.
+def import_lrs_into_scratch_workspace():
+    print "Importing LRS data into scratch workspace"
+    file.write("\n" + "\n" + "Began importing sgid lrs into scratch workspace at: " + str(datetime.datetime.now()))
+    arcpy.FeatureClassToGeodatabase_conversion(Input_Features="Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.TRANSPORTATION.UDOTRoutes_LRS", Output_Geodatabase=local_workspace)
 
 
-# Main function
+# Main function.
 if __name__ == "__main__":
     try:
-        # create text file for logging
+        #: Create a text file for logging.
         file.write("Began Assign Mileposts to Roads at: " + str(datetime.datetime.now()))
 
-        # import_sgid_roads_and_lrs_into_fgdb() # just for testing
-
-        # start and edit session and call functions that perform edits
-        #with arcpy.da.Editor(local_workspace) as edit:
+        #: Import the SGID LRS into scratch fgdb workspace.
+        #import_lrs_into_scratch_workspace()
         
         #: 1. Null out existing mileposts.
         print("Begin nulling out existing mileposts at ..." + str(datetime.datetime.now()))
-        null_existing_mileposts()
+        #null_existing_mileposts()
 
-        #: 2. Create new milepost tables.
+        #: 2. Create the new milepost tables in a temp fgdb.
         print("Begin creating the new milepost tables at ..." + str(datetime.datetime.now()))
-        create_new_milepost_values_tables()
+        #create_new_milepost_values_tables()
 
-        #: 3. Calculate the new milepost values from the tables to the feature class
+        #: 3. Calculate over the new milepost values from the tables to the feature class.
         print("Begin calculating the new mileposts from the table to the feature class at ..." + str(datetime.datetime.now()))
         field_calculate_milepost_values_to_roads(table_output_from_verts)
         field_calculate_milepost_values_to_roads(table_output_to_verts)
