@@ -28,7 +28,7 @@ file = open(text_file_path, "a")
 
 # global variables
 local_workspace = 'C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/' + 'UpdateUtransMileposts_' + formatted_date + '.gdb'
-arcpy.env.workspace = local_workspace
+arcpy.env.workspace = 'C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/' + 'UpdateUtransMileposts_' + formatted_date + '.gdb'
 #roads_fc = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # make fullpath to utrans
 roads_fc = 'Database Connections\\TestingConnection@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit'
 lrs_fc ='UDOTRoutes_LRS'
@@ -99,7 +99,9 @@ def create_new_milepost_values_tables():
     # locate features along route
     ## this is for road line features but it only honors the direction of the LRS and not the road arc direction.  table_output = arcpy.LocateFeaturesAlongRoutes_lr("roads_dot_rtname_lyr", lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/locate_feat_output", out_event_properties="RID LINE FMEAS TMEAS", route_locations="FIRST", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="NO_M_DIRECTION")
     # table_output = r"D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/locate_feat_output"
+    print "Begin locate features along route on FromVerts"
     table_output_from_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_from_verts_lyr", in_routes="UDOTRoutes_LRS", route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="out_table_from_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
+    print "Begin locate features along route on ToVerts"
     table_output_to_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_to_verts_lyr", in_routes="UDOTRoutes_LRS", route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="out_table_to_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
 
     print "Finished Locating Features Along Route at: " + str(datetime.datetime.now())
