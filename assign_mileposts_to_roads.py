@@ -78,8 +78,6 @@ def null_existing_mileposts():
     file.write("\n" + "nulled out mp to-values: " + str(nulled_out_to))
     file.write("\n" + "Finished nulling out existing mileposts at: " + str(datetime.datetime.now()))
 
-    del cursor
-    del row
     edit.stopOperation()
     edit.stopEditing(True)
 
@@ -116,7 +114,7 @@ def field_calculate_milepost_values_to_roads(table_output):
     #print "Begin table join at: " + str(datetime.datetime.now())
     #file.write("\n" + "\n" + "Begin table join at: " + str(datetime.datetime.now()))
 
-    # make table view from locate-features-along-routes output tables (only use rows where RID = DOT_RTNAME)
+    # make table view from locate-features-along-routes output tables (only use rows where RID = DOT_RTNAME - this ensures that correct LRS mile for that road segment is used - b/c the milepost tables also have other milepost values for the start/end points of the road segment if other LRS linework intersects that location.  Think of areas where the LRS intersects, so that point may retrun the milepost for both LRS line features.  This query ensures we are getting the correct milepost for that road segment)
     arcpy.MakeTableView_management(table_output, "table_view", "RID = DOT_RTNAME")
     
     # # join the output table to the roads data
@@ -175,13 +173,14 @@ def field_calculate_milepost_values_to_roads(table_output):
         milepost_field = 'DOT_T_MILE'
     fields = ["UNIQUE_ID", milepost_field]
 
-    with arcpy.da.UpdateCursor(roads_fc, fields) as cursor:
+    with arcpy.da.UpdateCursor(roads_fc, fields, "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')") as cursor: # limit the cursor to only use records that might contain milepost values (same query was used above to create the milpost tables). 
             for row in cursor:
                 my_counter = my_counter + 1
+                #: If the Road_Edits' UNIQUE_ID is in the dictionary, then assign it's value to the appropriate milepost field.
                 if row[0] in my_dict:
                     row[1] = my_dict[row[0]]
                 cursor.updateRow(row)
-                print "Updated " + str(my_counter) + " " + milepost_field + " recoreds so far.  Still updating..." 
+                print "Updated " + str(my_counter) + " " + milepost_field + " records so far.  Still updating..."
 
     print "Finished updating the Roads_Edit milepost field " + milepost_field +  " with " + str(my_counter) + " new milepost records."
 
@@ -213,7 +212,7 @@ if __name__ == "__main__":
         
         #: 1. Null out existing mileposts.
         print("Begin nulling out existing mileposts at ..." + str(datetime.datetime.now()))
-        #null_existing_mileposts()
+        null_existing_mileposts()
 
         #: 2. Create the new milepost tables in a temp fgdb.
         print("Begin creating the new milepost tables at ..." + str(datetime.datetime.now()))
