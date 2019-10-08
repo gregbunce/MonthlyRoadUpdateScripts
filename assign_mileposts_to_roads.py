@@ -172,19 +172,19 @@ if __name__ == "__main__":
         file.write("Began Assign Mileposts to Roads_Edit at: " + str(datetime.datetime.now()))
 
         #: 1. Create scratch fgdb workspace and import the SGID LRS.
-        #create_scratch_workspace_import_lrs()
+        create_scratch_workspace_import_lrs()
         
         #: 2. Null out existing mileposts.
         print("Begin nulling out existing mileposts at ..." + str(datetime.datetime.now()))
-        #null_existing_mileposts()
+        null_existing_mileposts()
 
         #: 3. Create the new milepost tables in a temp fgdb.
         print("Begin creating the new milepost tables at ..." + str(datetime.datetime.now()))
-        #create_new_milepost_values_tables()
+        create_new_milepost_values_tables()
 
         #: 4. Calculate over the new milepost values from the tables to the feature class.
         print("Begin calculating the new mileposts from the table to the feature class at ..." + str(datetime.datetime.now()))
-        #field_calculate_milepost_values_to_roads(table_output_from_verts)
+        field_calculate_milepost_values_to_roads(table_output_from_verts)
         field_calculate_milepost_values_to_roads(table_output_to_verts)
 
         #: 5. Finished.
