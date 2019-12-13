@@ -134,7 +134,7 @@ if __name__ == "__main__":
         boundaryFGDB = 'Boundaries.gdb'
         changesFGDB = 'Changes_' + formatted_date + '.gdb'
         projectFolder = 'C:/Users/gbunce/Documents/projects/BoundaryChanges'
-        sgid_connection = 'Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.'
+        sgid_connection = 'Database Connections/internal@SGID@internal.agrc.utah.gov.sde/SGID.'
 
         # datasets
         address_sys_quads = 'AddressSystemQuadrants'
