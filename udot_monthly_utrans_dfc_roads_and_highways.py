@@ -93,18 +93,18 @@ utrans_road_changes = arcpy.Merge_management([additions_fc, deletions_fc], dirna
 print("add the change fields at: " + time.strftime("%c"))
 arcpy.management.AddFields(
     utrans_road_changes, 
-    [['UNIQUEID_chg', 'TEXT', 'UniqueID change', 5, '', "False"],
-     ['COUNTY_ID_chg', 'TEXT', 'CountyID change', 5, '', "False"],
-     ['DOT_RTNAME_chg', 'TEXT', 'RtName change', 5, '', "False"],
-     ['DOT_SRFTYP_chg', 'TEXT', 'SrfTyp change', 5, '', "False"],
-     ['DOT_CLASS_chg', 'TEXT', 'DOT_Class change', 5, '', "False"],
-     ['DOT_OWN_chg', 'TEXT', 'DOT_OWN change', 5, '', "False"],
-     ['ONEWAY_chg', 'TEXT', 'Oneway change', 5, '', "False"]])
+    [['UNIQUEID_chg', 'TEXT', 'UniqueID change', 5, "False", ''],
+     ['COUNTY_ID_chg', 'TEXT', 'CountyID change', 5, "False", ''],
+     ['DOT_RTNAME_chg', 'TEXT', 'RtName change', 5, "False", ''],
+     ['DOT_SRFTYP_chg', 'TEXT', 'SrfTyp change', 5, "False", ''],
+     ['DOT_CLASS_chg', 'TEXT', 'DOT_Class change', 5, "False", ''],
+     ['DOT_OWN_chg', 'TEXT', 'DOT_OWN change', 5, "False", ''],
+     ['ONEWAY_chg', 'TEXT', 'Oneway change', 5, "False", '']])
 
 print("begin assiging the True value to Changed fields that had changes: " + time.strftime("%c"))
 #: loop through the attribute ('A') and spatial/attribute ('SA') records in the combined layer and compare values with the original values to see what fields have change
 #:            0           1            2          3           4           5              6             7           8            9           10          11             12             13                  14                15              16             17
-fields = ['BASE_FID','UPDATE_FID','UNIQUE_ID', 'COUNTY_L', 'COUNTY_R', 'DOT_RTNAME', 'DOT_SRFTYP', 'DOT_CLASS', 'DOT_OWN_L', 'DOT_OWN_R', 'ONEWAY', 'UNIQUEID_chg', 'COUNTY_chg', 'DOT_RTNAME_chg', 'DOT_SRFTYP_chg', 'DOT_CLASS_chg', 'DOT_OWN_chg', 'ONEWAY_chg']
+fields = ['BASE_FID','UPDATE_FID','UNIQUE_ID', 'COUNTY_L', 'COUNTY_R', 'DOT_RTNAME', 'DOT_SRFTYP', 'DOT_CLASS', 'DOT_OWN_L', 'DOT_OWN_R', 'ONEWAY', 'UNIQUEID_chg', 'COUNTY_ID_chg', 'DOT_RTNAME_chg', 'DOT_SRFTYP_chg', 'DOT_CLASS_chg', 'DOT_OWN_chg', 'ONEWAY_chg']
 base_fc_oid_field_name = arcpy.Describe(snapshot_base_fc).OIDFieldName
 where_clause = "CHANGE_TYPE in ('A', 'SA')"
 # loop through each row in the search cursor
@@ -134,7 +134,7 @@ with arcpy.da.UpdateCursor(utrans_road_changes, fields, where_clause) as update_
         base_ownL = ""
         base_ownR = ""
         base_oneway = ""
-        #:                 0            1           2           3             4            5              6          7           8 
+        #:                 0            1           2           3             4            5              6           7           8 
         base_fields = ['UNIQUE_ID', 'COUNTY_L', 'COUNTY_R', 'DOT_RTNAME', 'DOT_SRFTYP', 'DOT_CLASS', 'DOT_OWN_L', 'DOT_OWN_R', 'ONEWAY']
         base_where_clause = str(base_fc_oid_field_name) + " = " + str(base_fid)
         with arcpy.da.SearchCursor(snapshot_base_fc, base_fields, base_where_clause) as base_search_cursor:
