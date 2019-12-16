@@ -1,4 +1,5 @@
 #: use python 3
+#: update the following variables based on the current run [current_update_fc, snapshot_base_fc]
 
 # Import system modules
 import os
@@ -7,8 +8,8 @@ from arcpy import env
 import time
 
 #: set the input datasets
-current_update_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_dfc_testing.gdb\\update_fc'  #: current utrans exprot to fgdb.
-snapshot_base_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_dfc_testing.gdb\\base_fc'   #: snapshot of utrans from last run.
+current_update_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_change_detection_testing.gdb\\update_roads_washCo'  #: current utrans exprot to fgdb.
+snapshot_base_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_change_detection_testing.gdb\\base_roads_washCo'   #: snapshot of utrans from last run.
 #utrans_road_changes = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_dfc_testing2.gdb\\utrans_road_changes'
 
 #: get the directory path
@@ -92,13 +93,13 @@ utrans_road_changes = arcpy.Merge_management([additions_fc, deletions_fc], dirna
 print("add the change fields at: " + time.strftime("%c"))
 arcpy.management.AddFields(
     utrans_road_changes, 
-    [['UNIQUEID_chg', 'TEXT', 'UniqueID changes', 5, '', ''],
-     ['COUNTY_chg', 'TEXT', 'County changes', 5, '', ''],
-     ['DOT_RTNAME_chg', 'TEXT', 'RtName changes', 5, '', ''],
-     ['DOT_SRFTYP_chg', 'TEXT', 'SrfTyp changes', 5, '', ''],
-     ['DOT_CLASS_chg', 'TEXT', 'DOT_Class changes', 5, '', ''],
-     ['DOT_OWN_chg', 'TEXT', 'DOT_OWN changes', 5, '', ''],
-     ['ONEWAY_chg', 'TEXT', 'Oneway changes', 5, '', '']])
+    [['UNIQUEID_chg', 'TEXT', 'UniqueID change', 5, '', "False"],
+     ['COUNTY_ID_chg', 'TEXT', 'CountyID change', 5, '', "False"],
+     ['DOT_RTNAME_chg', 'TEXT', 'RtName change', 5, '', "False"],
+     ['DOT_SRFTYP_chg', 'TEXT', 'SrfTyp change', 5, '', "False"],
+     ['DOT_CLASS_chg', 'TEXT', 'DOT_Class change', 5, '', "False"],
+     ['DOT_OWN_chg', 'TEXT', 'DOT_OWN change', 5, '', "False"],
+     ['ONEWAY_chg', 'TEXT', 'Oneway change', 5, '', "False"]])
 
 print("begin assiging the True value to Changed fields that had changes: " + time.strftime("%c"))
 #: loop through the attribute ('A') and spatial/attribute ('SA') records in the combined layer and compare values with the original values to see what fields have change
@@ -121,7 +122,6 @@ with arcpy.da.UpdateCursor(utrans_road_changes, fields, where_clause) as update_
         current_ownL = str(update_cursor[8])
         current_ownR = str(update_cursor[9])
         current_oneway = str(update_cursor[10])
-
 
         #: get the base/snapshot fc field values.
         base_fid = str(update_cursor[0])
