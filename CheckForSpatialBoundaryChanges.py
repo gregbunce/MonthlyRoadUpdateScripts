@@ -1,3 +1,5 @@
+# Use Python2 or update data connection files to pro connections.
+
 import arcpy, os, datetime
 
 # this runs as on a weekly scheduled task on my machine (for now - then maybe forklift after testing)

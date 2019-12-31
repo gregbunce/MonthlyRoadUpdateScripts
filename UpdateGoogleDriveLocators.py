@@ -7,11 +7,11 @@ previousRebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\Rebuil
 hnasLocators_Folder = 'G:\\Shared drives\\AGRC Projects\\Locators'
 #previousHnasLocators_Folder = 'K:/AGRC Projects/Locators/PreviousLocators'
 previousHnasLocators_Folder = 'G:\\Shared drives\\AGRC Projects\\Locators\\_previousRebuild'
-sgidAddressPoints = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.LOCATION.AddressPoints"
+sgidAddressPoints = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.LOCATION.AddressPoints"
 addressPointLocator = "AGRC_AddressPointLocator"
 roadsLocator = "AGRC_RoadsLocator"
 compositeLocator = "AGRC_CompositeLocator"
-arcpy.env.workspace = rebuildLocators_Folder 
+arcpy.env.workspace = rebuildLocators_Folder
 
 #### Move all existing files in rebuild folder to the backup folder. ####
 # delete all files in the backup folder

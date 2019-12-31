@@ -1,5 +1,6 @@
-#: use python 3
-#: update the following variables based on the current run [current_update_fc, snapshot_base_fc]
+#: this code is used by AGRC to detect monthly road centerline changes.  UDOT will use the output to update the Roads and Highway system.
+#: use python 3 (ArcGIS Pro)
+#: update the following variables based on the current road update [current_update_fc, snapshot_base_fc]
 
 # Import system modules
 import os
@@ -8,9 +9,8 @@ from arcpy import env
 import time
 
 #: set the input datasets
-current_update_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_change_detection_testing.gdb\\update_roads_washCo'  #: current utrans exprot to fgdb.
-snapshot_base_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_change_detection_testing.gdb\\base_roads_washCo'   #: snapshot of utrans from last run.
-#utrans_road_changes = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\script_testing\\udot_dfc_testing2.gdb\\utrans_road_changes'
+current_update_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\2019_1227\\utrans_monthly_road_changes_20191227.gdb\\current_update_roads'  #: current utrans exprot to fgdb.
+snapshot_base_fc = 'C:\\Users\\gbunce\\Documents\\projects\\UTRANS\\udot_monthly_change_detection\\2019_1227\\utrans_monthly_road_changes_20191227.gdb\\snapshot_base_roads_20190422'   #: snapshot of utrans from last run.
 
 #: get the directory path
 dirname = os.path.dirname(arcpy.Describe(current_update_fc).catalogPath)
@@ -18,7 +18,7 @@ desc = arcpy.Describe(dirname)
 if hasattr(desc, "datasetType") and desc.datasetType=='FeatureDataset':
     dirname = os.path.dirname(dirname)
 
-#: set the dfc tool outputs
+#: set the change detection tool outputs
 dfc_output_fc = dirname + "\\dfc_output_fc"
 dfc_output_matchtable = dirname + "\\dfc_output_matchtable"
 
@@ -39,6 +39,7 @@ print("finished dfc at: " + time.strftime("%c"))
 
 #: join the source datasets to the detect feature change output
 arcpy.env.qualifiedFieldNames = False
+
 #: Make a feature layers from the feature classes
 arcpy.MakeFeatureLayer_management(current_update_fc, "current_update_roads_lyr")
 arcpy.MakeFeatureLayer_management(snapshot_base_fc, "snapshot_base_roads_lyr")
@@ -49,8 +50,7 @@ joinField_current_roads = arcpy.Describe("current_update_roads_lyr").OIDFieldNam
 joinField_snapshot_roads = arcpy.Describe("snapshot_base_roads_lyr").OIDFieldName
 #joinField_dfc = "UPDATE_FID"
 
-
-#: get the additions
+#: get the detected additions
 print("begin joining additions at: " + time.strftime("%c"))
 #: join the current utrans roads to the dfc table to get the new changes
 arcpy.AddJoin_management("current_update_roads_lyr", joinField_current_roads, "output_dfc_additions_lyr", "UPDATE_FID")
@@ -65,8 +65,7 @@ print("add additions to new fc at: " + time.strftime("%c"))
 additions_fc = dirname + "\\utrans_road_changes_additions"
 arcpy.CopyFeatures_management(layerName, additions_fc)
 
-
-#: get the deletions
+#: get the detected deletions
 print("begin joining deletions at: " + time.strftime("%c"))
 arcpy.MakeFeatureLayer_management(dfc_output_fc, "output_dfc_deletions_lyr", "CHANGE_TYPE = 'D'")
 #: copy the selected features to the new feature class - the deletions from the change detection
@@ -86,7 +85,6 @@ arcpy.CopyFeatures_management(layerName, deletions_fc)
 #: combine the additions and deletions layers into a new fc named utrans_road_changes
 print("merge the additions and deletions layers to gether into a combined output feature class: " + time.strftime("%c"))
 utrans_road_changes = arcpy.Merge_management([additions_fc, deletions_fc], dirname + "\\utrans_road_changes", "", "NO_SOURCE_INFO")
-
 
 #: begin section to track and report what specific fields have different field values - the dfc only reports that there was an attribute change, and doesn't indicate which field.
 #: add the following fields to the utrans_roads_changes feature class: [UNIQUE_ID_chg, COUNTY_chg, DOT_RTNAME_chg, DOT_SRFTYP_chg, DOT_CLASS_chg, DOT_OWN_chg, ONEWAY_chg]

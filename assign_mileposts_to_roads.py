@@ -28,14 +28,14 @@ file = open(text_file_path, "a")
 
 # global variables
 local_workspace = 'C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/' + 'UpdateUtransMileposts_' + formatted_date + '.gdb'
-arcpy.env.workspace = 'C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/' + 'UpdateUtransMileposts_' + formatted_date + '.gdb'
+arcpy.env.workspace = 'C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/UpdateUtransMileposts_' + formatted_date + '.gdb'
 roads_fc = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit' # make fullpath to utrans
 # roads_fc = 'Database Connections\\TestingConnection@utrans.agrc.utah.gov.sde\\UTRANS.TRANSADMIN.Centerlines_Edit\\UTRANS.TRANSADMIN.Roads_Edit'
 lrs_fc = 'C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/UpdateUtransMileposts_' + formatted_date + '.gdb/UDOTRoutes_LRS'
 utrans_conn = 'Database Connections\\DC_TRANSADMIN@UTRANS@utrans.agrc.utah.gov.sde'
 # utrans_conn = 'Database Connections\\TestingConnection@utrans.agrc.utah.gov.sde'
-table_output_from_verts = "out_table_from_verts"
-table_output_to_verts = "out_table_to_verts"
+table_output_from_verts = "C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/UpdateUtransMileposts_" + formatted_date + ".gdb/out_table_from_verts"
+table_output_to_verts = "C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/UpdateUtransMileposts_" + formatted_date + ".gdb/out_table_to_verts"
 
 
 #: Function to null out existing mileposts
@@ -100,9 +100,9 @@ def create_new_milepost_values_tables():
     ## this is for road line features but it only honors the direction of the LRS and not the road arc direction.  table_output = arcpy.LocateFeaturesAlongRoutes_lr("roads_dot_rtname_lyr", lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/locate_feat_output", out_event_properties="RID LINE FMEAS TMEAS", route_locations="FIRST", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="NO_M_DIRECTION")
     # table_output = r"D:/UTRANS/UpdateMilepostsInRoads_Edit/testing.gdb/locate_feat_output"
     print "Begin locate features along route on FromVerts"
-    table_output_from_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_from_verts_lyr", in_routes=lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="out_table_from_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
+    table_output_from_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_from_verts_lyr", in_routes=lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/UpdateUtransMileposts_" + formatted_date + ".gdb/out_table_from_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
     print "Begin locate features along route on ToVerts"
-    table_output_to_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_to_verts_lyr", in_routes=lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="out_table_to_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
+    table_output_to_verts = arcpy.LocateFeaturesAlongRoutes_lr("roads_to_verts_lyr", in_routes=lrs_fc, route_id_field="LABEL", radius_or_tolerance="0 Meters", out_table="C:/Users/gbunce/Documents/projects/UTRANS/UpdateMilepostsInRoads_Edit/UpdateUtransMileposts_" + formatted_date + ".gdb/out_table_to_verts", out_event_properties="RID POINT MEAS", route_locations="ALL", distance_field="DISTANCE", zero_length_events="ZERO", in_fields="FIELDS", m_direction_offsetting="M_DIRECTON")
 
     print "Finished Locating Features Along Route at: " + str(datetime.datetime.now())
     file.write("\n" + "Finished Locating Features Along Route at: " + str(datetime.datetime.now()))
@@ -111,6 +111,7 @@ def create_new_milepost_values_tables():
 
 #: Function to calculate over the milepost values from the fgdb temp tables to the UTRANS Roads feature class.
 def field_calculate_milepost_values_to_roads(table_output):
+    print table_output
     # make table view from locate-features-along-routes output tables (only use rows where RID = DOT_RTNAME - this ensures that correct LRS mile for that road segment is used - b/c the milepost tables also have other milepost values for the start/end points of the road segment if other LRS linework intersects that location.  Think of areas where the LRS intersects, so that point may retrun the milepost for both LRS line features.  This query ensures we are getting the correct milepost for that road segment)
     arcpy.MakeTableView_management(table_output, "table_view", "RID = DOT_RTNAME")
 
@@ -129,9 +130,9 @@ def field_calculate_milepost_values_to_roads(table_output):
             my_dict[row[0]] = row[1]
 
     #: Use update cursor and python dictionary to update the Roads_Edit milepost fields
-    if str(table_output) == "out_table_from_verts":
+    if str(table_output) == table_output_from_verts:
         milepost_field = 'DOT_F_MILE'
-    if str(table_output) == "out_table_to_verts":
+    if str(table_output) == table_output_to_verts:
         milepost_field = 'DOT_T_MILE'
     fields = ["UNIQUE_ID", milepost_field]
 
@@ -168,19 +169,19 @@ def create_scratch_workspace_import_lrs():
 # Main function.
 if __name__ == "__main__":
     try:
-        #: Create a text file for logging.
-        file.write("Began Assign Mileposts to Roads_Edit at: " + str(datetime.datetime.now()))
+        # #: Create a text file for logging.
+        # file.write("Began Assign Mileposts to Roads_Edit at: " + str(datetime.datetime.now()))
 
-        #: 1. Create scratch fgdb workspace and import the SGID LRS.
-        create_scratch_workspace_import_lrs()
+        # #: 1. Create scratch fgdb workspace and import the SGID LRS.
+        # create_scratch_workspace_import_lrs()
         
-        #: 2. Null out existing mileposts.
-        print("Begin nulling out existing mileposts at ..." + str(datetime.datetime.now()))
-        null_existing_mileposts()
+        # #: 2. Null out existing mileposts.
+        # print("Begin nulling out existing mileposts at ..." + str(datetime.datetime.now()))
+        # null_existing_mileposts()
 
-        #: 3. Create the new milepost tables in a temp fgdb.
-        print("Begin creating the new milepost tables at ..." + str(datetime.datetime.now()))
-        create_new_milepost_values_tables()
+        # #: 3. Create the new milepost tables in a temp fgdb.
+        # print("Begin creating the new milepost tables at ..." + str(datetime.datetime.now()))
+        # create_new_milepost_values_tables()
 
         #: 4. Calculate over the new milepost values from the tables to the feature class.
         print("Begin calculating the new mileposts from the table to the feature class at ..." + str(datetime.datetime.now()))

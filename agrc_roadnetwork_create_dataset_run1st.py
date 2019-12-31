@@ -9,7 +9,8 @@ import os
 #today = date.today()
 #strDate = str(today.month).zfill(2) + str(today.day).zfill(2) +  str(today.year) 
 
-sgid_roads = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.TRANSPORTATION.Roads"
+#sgid_roads = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.TRANSPORTATION.Roads"
+sgid_roads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads"
 
 # main function
 def main():
@@ -274,7 +275,7 @@ def generate_scratch_data(directory):
 
     # union the census urban areas and the sgid muni
     print "Union the Census Urban Areas and SGID Munis"
-    unioned_fc = arcpy.Union_analysis(in_features="'Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.DEMOGRAPHIC.UrbanAreasCensus2010' #;'Database Connections/DC_agrc@SGID10@sgid.agrc.utah.gov.sde/SGID10.BOUNDARIES.Municipalities' #", out_feature_class= str(directory) + "/NetworkBuild_scratchData.gdb/UrbanAreasMuni_Union", join_attributes="ONLY_FID", cluster_tolerance="", gaps="GAPS")
+    unioned_fc = arcpy.Union_analysis(in_features="'Database Connections/internal@SGID@internal.agrc.utah.gov.sde/SGID.DEMOGRAPHIC.UrbanAreasCensus2010' #;'Database Connections/internal@SGID@internal.agrc.utah.gov.sde/SGID.BOUNDARIES.Municipalities' #", out_feature_class= str(directory) + "/NetworkBuild_scratchData.gdb/UrbanAreasMuni_Union", join_attributes="ONLY_FID", cluster_tolerance="", gaps="GAPS")
 
     # dissolve this unioned data
     print "Dissolve the unioned layer"
