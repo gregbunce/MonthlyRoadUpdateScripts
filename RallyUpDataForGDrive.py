@@ -134,20 +134,22 @@ roadGrinderDatabase = "C:/Temp/RoadGrinder.gdb"
 print "Copying RoadGrinder.gdb from c:/temp folder to the DataForGDrive folder ..."
 arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
 
-##: UtahNG911GIS.gdb
-ng911Database = "L:/agrc/data/ng911/UtahNG911GIS.gdb"
-print "Copying UtahNG911GIS.gdb from agrc-share ng911 folder to the DataForGDrive folder ..."
-arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
+#: Get sgid roads data
+sgidRoads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads"
 
 ##: Roads.gdb
-# sgidRoads = "Database Connections\\DC_agrc@SGID10@sgid.agrc.utah.gov.sde\\SGID10.TRANSPORTATION.Roads"
-# arcpy.CreateFileGDB_management(directory, "Roads.gdb")
-# print "Importing SGID.Roads into Road.gdb ..."
-# arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
+print "Importing SGID.Roads into Road.gdb ..."
+arcpy.CreateFileGDB_management(directory, "Roads.gdb")
+arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
 
-##: Roads.shp
-# print "Importing SGID.Roads into Road.shp ..."
-# arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
+#: Roads.shp
+print "Importing SGID.Roads into Road.shp ..."
+arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
+
+##: UtahNG911GIS.gdb
+ng911Database = "\\\\itwfpcap2\\AGRC\\agrc\\data\\ng911\\UtahNG911GIS.gdb"
+print "Copying UtahNG911GIS.gdb from agrc-share ng911 folder to the DataForGDrive folder ..."
+arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
 
 ##: AGRC_AddressPointLocator.gcpk
 addressPntLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_AddressPointLocator.gcpk"
@@ -167,14 +169,14 @@ print "Copying AGRC_CompositeLocator.gcpk from C:\\Users\\gbunce\\Documents\\pro
 arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
 
 
-##: now compress the files (zip them up)
+#: now compress the files (zip them up)
 #: zip the shapefile
-#ZipShp(directory + "/Roads.shp", False)
+ZipShp(directory + "/Roads.shp", False)
 
 ##: zip the geodatabases
 ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
 ZipFileGeodatabase(directory + "/UtahNG911GIS.gdb", directory + "/UtahNG911GIS_gdb.zip")
-#ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
+ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
 
 ##: zip the locator packages
 ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")

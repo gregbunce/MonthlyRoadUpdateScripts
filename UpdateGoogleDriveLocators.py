@@ -32,7 +32,7 @@ print "Copying RoadGrinder.gdb from C:/temp to the rebuild folder..."
 arcpy.Copy_management(roadGrinderOutput, rebuildLocators_Folder + "/RoadGrinder.gdb")
 
 #### Import the address point from SGID into the roadgrinder database. ####
-print "Importing SGID.AddressPoints into RoadGrinder.gdb, on rebuild folder..."
+print "Importing SGID.AddressPoints into RoadGrinder.gdb in local rebuild folder..."
 arcpy.FeatureClassToFeatureClass_conversion(sgidAddressPoints, rebuildLocators_Folder + "/RoadGrinder.gdb", "SgidAddrPnts")
 
 #### Copy the three locators from hnas to the rebuild folder. ####

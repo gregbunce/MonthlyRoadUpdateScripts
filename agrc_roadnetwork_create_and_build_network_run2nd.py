@@ -1,6 +1,6 @@
 '''
 Notes on running this script:
-1. Change the directory variable ('new_network_location') to point to the newest RecentsBuilds folder.
+1. Change the directory variable ('new_network_location') to point to the newest RecentsBuilds folder (variable >> new_network_location).
 2. Make sure to use python-3 (or Desktop 10.6)
 '''
 
@@ -23,7 +23,7 @@ try:
     
     #Set local variables
     ##original_network = "C:/data/Region1.gdb/Transportation/Streets_ND"
-    new_network_location = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2019_12_23\\UtahRoadsNetworkAnalysis.gdb\\NetworkDataset"
+    new_network_location = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2020_6_24\\UtahRoadsNetworkAnalysis.gdb\\NetworkDataset"
     xml_template = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\agrc_network_template.xml"
     
     #Create an XML template from the original network dataset

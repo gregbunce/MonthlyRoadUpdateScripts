@@ -15,7 +15,7 @@ def DeletePreviousBoundaries():
             #path = os.path.join(arcpy.env.workspace, ds, fc)
             if "_Prev" in str(fc):
                 arcpy.Delete_management(fc)
-                
+
 def RenameExistingDatasets():
     print("Renaming existing boundaries to append _Prev...")
     datasets = arcpy.ListDatasets(feature_type='feature')
