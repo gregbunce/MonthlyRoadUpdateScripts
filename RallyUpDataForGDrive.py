@@ -1,5 +1,13 @@
 import arcpy, os, shutil, datetime, zipfile, glob
 
+#: Notes before running: verify that these variables are pointing to the correct data (ie: VPN vs at work)
+mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_01072021.gdb"
+statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2021_1_7\\UtahRoadsNetworkAnalysis.gdb"
+roadGrinderDatabase = "C:\\Temp\\RoadGrinder.gdb" # this path and file name should be stable, not needing to be repointed
+ng911Database = "C:\\Temp\\NG911GIS_Schema.gdb" # this path and file name should be stable, not needing to be repointed
+# sgidRoads (roads are now accessed via open data so this process is no longer needed)
+
+
 #### BEGIN >>> Zip Shapefile function ####
 def ZipShp (inShp, Delete = True):
  
@@ -130,53 +138,67 @@ arcpy.env.workspace = directory
 ####: Fetch the data and bring it to C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive\\ #### 
 ##: RoadGrinder.gdb
 #roadGrinderDatabase = "G:/Team Drives/AGRC Projects/Locators/RoadGrinder.gdb"
-roadGrinderDatabase = "C:/Temp/RoadGrinder.gdb"
-print "Copying RoadGrinder.gdb from c:/temp folder to the DataForGDrive folder ..."
-arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
+# roadGrinderDatabase = "C:/Temp/RoadGrinder.gdb"
+# print "Copying RoadGrinder.gdb from c:/temp folder to the DataForGDrive folder ..."
+# arcpy.Copy_management(roadGrinderDatabase, "RoadGrinder.gdb")
 
-#: Get sgid roads data
-sgidRoads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads"
+#: Get sgid roads data (roads are now accessed via open data so this process is no longer needed)
+# sgidRoads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads" #: use a local copy when connected to the VPN
+# sgidRoads = "C:\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2020_10_09.gdb\\Roads"
 
-##: Roads.gdb
-print "Importing SGID.Roads into Road.gdb ..."
-arcpy.CreateFileGDB_management(directory, "Roads.gdb")
-arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
+##: Roads.gdb (roads are now accessed via open data so this process is no longer needed)
+#print "Importing SGID.Roads into Road.gdb ..."
+# arcpy.CreateFileGDB_management(directory, "Roads.gdb")
+# arcpy.FeatureClassToFeatureClass_conversion(sgidRoads, "Roads.gdb", "Roads")
 
-#: Roads.shp
-print "Importing SGID.Roads into Road.shp ..."
-arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
+#: Roads.shp (roads are now accessed via open data so this process is no longer needed)
+#print "Importing SGID.Roads into Road.shp ..."
+# arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
 
 ##: UtahNG911GIS.gdb
-ng911Database = "\\\\itwfpcap2\\AGRC\\agrc\\data\\ng911\\UtahNG911GIS.gdb"
-print "Copying UtahNG911GIS.gdb from agrc-share ng911 folder to the DataForGDrive folder ..."
-arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
+#ng911Database = "\\\\itwfpcap2\\AGRC\\agrc\\data\\ng911\\UtahNG911GIS.gdb"
+# ng911Database = "C:\Users\\gbunce\\Documents\\projects\\NG911_Database\\LatestDB\\UtahNG911GIS.gdb"
+# print "Copying UtahNG911GIS.gdb from local ng911 folder to the DataForGDrive folder ..."
+# arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
+
+# ##: MM_NetworkDataset_date.gdb
+# mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_01072021.gdb"
+# print "Copying MM_Network Dataset to the DataForGDrive folder ..."
+# arcpy.Copy_management(mmp_network, "MM_NetworkDataset.gdb")
+
+# ##: UtahRoadsNetworkAnalysis.gdb
+# statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2021_1_7\\UtahRoadsNetworkAnalysis.gdb"
+# print "Copying UtahRoadsNetwork dataset to the DataForGDrive folder ..."
+# arcpy.Copy_management(statewide_road_network, "UtahRoadsNetworkAnalysis.gdb")
 
 ##: AGRC_AddressPointLocator.gcpk
 addressPntLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_AddressPointLocator.gcpk"
 print "Copying AGRC_AddressPointLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
 arcpy.Copy_management(addressPntLocatorPackage, "AGRC_AddressPointLocator.gcpk")
 
-
 ##: AGRC_RoadsLocator.gcpk
 roadsLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_RoadsLocator.gcpk"
 print "Copying AGRC_RoadsLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
 arcpy.Copy_management(roadsLocatorPackage, "AGRC_RoadsLocator.gcpk")
-
 
 ##: AGRC_CompositeLocator.gcpk
 compositeLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_CompositeLocator.gcpk"
 print "Copying AGRC_CompositeLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
 arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
 
-
 #: now compress the files (zip them up)
-#: zip the shapefile
-ZipShp(directory + "/Roads.shp", False)
+
+#: zip the shapefiles
+# ZipShp(directory + "/Roads.shp", False)
 
 ##: zip the geodatabases
-ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
-ZipFileGeodatabase(directory + "/UtahNG911GIS.gdb", directory + "/UtahNG911GIS_gdb.zip")
-ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
+# ZipFileGeodatabase(directory + "/RoadGrinder.gdb", directory + "/RoadGrinder_gdb.zip")
+# ZipFileGeodatabase(directory + "/UtahNG911GIS.gdb", directory + "/UtahNG911GIS_gdb.zip")
+ZipFileGeodatabase(roadGrinderDatabase, directory + "/RoadGrinder_gdb.zip")
+ZipFileGeodatabase(ng911Database, directory + "/UtahNG911GIS_gdb.zip")
+ZipFileGeodatabase(mmp_network, directory + "/MM_NetworkDataset_gdb.zip")
+ZipFileGeodatabase(statewide_road_network, directory + "/UtahRoadsNetworkAnalysis_gdb.zip")
+#ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
 
 ##: zip the locator packages
 ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")

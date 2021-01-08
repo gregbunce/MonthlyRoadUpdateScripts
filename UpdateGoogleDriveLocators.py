@@ -1,13 +1,19 @@
 import arcpy, shutil, os
 
+#: Notes: verify these variables: 
+    # sgidAddressPoints (using local copy when at home)
+
+
 # variables
+# sgidAddressPoints = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.LOCATION.AddressPoints"
+sgidAddressPoints = "C:\\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2021_01_07.gdb\\AddressPoints" #: use local copy when at home
+
 rebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators'
 previousRebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\_previousRebuild'
 #hnasLocators_Folder = 'K:/AGRC Projects/Locators'
 hnasLocators_Folder = 'G:\\Shared drives\\AGRC Projects\\Locators'
 #previousHnasLocators_Folder = 'K:/AGRC Projects/Locators/PreviousLocators'
 previousHnasLocators_Folder = 'G:\\Shared drives\\AGRC Projects\\Locators\\_previousRebuild'
-sgidAddressPoints = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.LOCATION.AddressPoints"
 addressPointLocator = "AGRC_AddressPointLocator"
 roadsLocator = "AGRC_RoadsLocator"
 compositeLocator = "AGRC_CompositeLocator"

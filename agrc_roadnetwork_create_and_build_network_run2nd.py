@@ -7,7 +7,7 @@ Notes on running this script:
 # Name: NetworkDatasetTemplate_workflow.py
 # Description: Create a new network dataset with the same schema as an existing
 #               network dataset
-# Requirements: Network Analyst Extension
+# Requirements: Network Analysst Extension
 
 
 #Import system modules
@@ -23,7 +23,7 @@ try:
     
     #Set local variables
     ##original_network = "C:/data/Region1.gdb/Transportation/Streets_ND"
-    new_network_location = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2020_6_24\\UtahRoadsNetworkAnalysis.gdb\\NetworkDataset"
+    new_network_location = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2021_1_7\\UtahRoadsNetworkAnalysis.gdb\\NetworkDataset"
     xml_template = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\agrc_network_template.xml"
     
     #Create an XML template from the original network dataset
