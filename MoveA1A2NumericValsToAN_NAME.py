@@ -65,6 +65,8 @@ for row in cursor:
     temp_dict['a2_posttype'] = row[10]
     temp_dict['a2_postdir'] = row[11]
 
+    print temp_dict['objectid']
+    
 # Create variable to hold string that is the split of A1_NAME
     if temp_dict['a1_name'] is not None:
         a1_name_split = temp_dict['a1_name'].split(" ")

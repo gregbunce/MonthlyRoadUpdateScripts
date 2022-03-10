@@ -6,6 +6,7 @@ import os
 #from datetime import datetime
 
 #: Notes before running: verify that these variables are pointing to the correct data (ie: at home vs at work)
+    #: python 2.7
     # sgid_roads
 
 # get the date
@@ -13,7 +14,7 @@ import os
 #strDate = str(today.month).zfill(2) + str(today.day).zfill(2) +  str(today.year) 
 
 # sgid_roads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads" #: use a local copy when connected to the VPN
-sgid_roads = "C:\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2021_01_07.gdb\\Roads"
+sgid_roads = "C:\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2022_3_9.gdb\\Roads"
 
 # main function
 def main():

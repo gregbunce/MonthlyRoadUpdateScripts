@@ -1,8 +1,8 @@
 import arcpy, os, shutil, datetime, zipfile, glob
 
 #: Notes before running: verify that these variables are pointing to the correct data (ie: VPN vs at work)
-mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_01072021.gdb"
-statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2021_1_7\\UtahRoadsNetworkAnalysis.gdb"
+mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_02092022.gdb"
+statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2022_2_9\\UtahRoadsNetworkAnalysis.gdb"
 roadGrinderDatabase = "C:\\Temp\\RoadGrinder.gdb" # this path and file name should be stable, not needing to be repointed
 ng911Database = "C:\\Temp\\NG911GIS_Schema.gdb" # this path and file name should be stable, not needing to be repointed
 # sgidRoads (roads are now accessed via open data so this process is no longer needed)
@@ -135,8 +135,10 @@ else:
 # set this folder as the work env
 arcpy.env.workspace = directory
 
-####: Fetch the data and bring it to C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive\\ #### 
-##: RoadGrinder.gdb
+
+####: Fetch the data and bring it to C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive\\ ####
+
+##: RoadGrinder.gdb (i'm no longer moving the file into the DataForGDrive folder, now leaving it where it is and moving the zipped file)
 #roadGrinderDatabase = "G:/Team Drives/AGRC Projects/Locators/RoadGrinder.gdb"
 # roadGrinderDatabase = "C:/Temp/RoadGrinder.gdb"
 # print "Copying RoadGrinder.gdb from c:/temp folder to the DataForGDrive folder ..."
@@ -155,18 +157,18 @@ arcpy.env.workspace = directory
 #print "Importing SGID.Roads into Road.shp ..."
 # arcpy.FeatureClassToShapefile_conversion(sgidRoads, directory)
 
-##: UtahNG911GIS.gdb
+##: UtahNG911GIS.gdb (i'm no longer moving the file into the DataForGDrive folder, now leaving it where it is and moving the zipped file)
 #ng911Database = "\\\\itwfpcap2\\AGRC\\agrc\\data\\ng911\\UtahNG911GIS.gdb"
 # ng911Database = "C:\Users\\gbunce\\Documents\\projects\\NG911_Database\\LatestDB\\UtahNG911GIS.gdb"
 # print "Copying UtahNG911GIS.gdb from local ng911 folder to the DataForGDrive folder ..."
 # arcpy.Copy_management(ng911Database, "UtahNG911GIS.gdb")
 
-# ##: MM_NetworkDataset_date.gdb
+# ##: MM_NetworkDataset_date.gdb (i'm not longer moving the file into the DataForGDrive folder, now leaving it where it is and moving the zipped file)
 # mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_01072021.gdb"
 # print "Copying MM_Network Dataset to the DataForGDrive folder ..."
 # arcpy.Copy_management(mmp_network, "MM_NetworkDataset.gdb")
 
-# ##: UtahRoadsNetworkAnalysis.gdb
+# ##: UtahRoadsNetworkAnalysis.gdb (i'm not longer moving the file into the DataForGDrive folder, now leaving it where it is and moving the zipped file)
 # statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2021_1_7\\UtahRoadsNetworkAnalysis.gdb"
 # print "Copying UtahRoadsNetwork dataset to the DataForGDrive folder ..."
 # arcpy.Copy_management(statewide_road_network, "UtahRoadsNetworkAnalysis.gdb")
