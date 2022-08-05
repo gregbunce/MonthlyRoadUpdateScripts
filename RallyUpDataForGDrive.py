@@ -1,8 +1,8 @@
 import arcpy, os, shutil, datetime, zipfile, glob
 
 #: Notes before running: verify that these variables are pointing to the correct data (ie: VPN vs at work)
-mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_06142022.gdb"
-statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2022_6_14\\UtahRoadsNetworkAnalysis.gdb"
+mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_08042022.gdb"
+statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2022_8_4\\UtahRoadsNetworkAnalysis.gdb"
 roadGrinderDatabase = "C:\\Temp\\RoadGrinder.gdb" # this path and file name should be stable, not needing to be repointed
 ng911Database = "C:\\Temp\\NG911GIS_Schema.gdb" # this path and file name should be stable, not needing to be repointed
 # sgidRoads (roads are now accessed via open data so this process is no longer needed)
@@ -174,19 +174,19 @@ arcpy.env.workspace = directory
 # arcpy.Copy_management(statewide_road_network, "UtahRoadsNetworkAnalysis.gdb")
 
 ##: AGRC_AddressPointLocator.gcpk
-addressPntLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_AddressPointLocator.gcpk"
-print "Copying AGRC_AddressPointLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
-arcpy.Copy_management(addressPntLocatorPackage, "AGRC_AddressPointLocator.gcpk")
+addressPntLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\ugrc_address_point_locator_package.gcpk"
+print "Copying UGRC_AddressPointLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
+arcpy.Copy_management(addressPntLocatorPackage, "UGRC_AddressPointLocator.gcpk")
 
 ##: AGRC_RoadsLocator.gcpk
-roadsLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_RoadsLocator.gcpk"
-print "Copying AGRC_RoadsLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
-arcpy.Copy_management(roadsLocatorPackage, "AGRC_RoadsLocator.gcpk")
+roadsLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\ugrc_roads_locator_package.gcpk"
+print "Copying UGRC_RoadsLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
+arcpy.Copy_management(roadsLocatorPackage, "UGRC_RoadsLocator.gcpk")
 
 ##: AGRC_CompositeLocator.gcpk
-compositeLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\AGRC_CompositeLocator.gcpk"
-print "Copying AGRC_CompositeLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
-arcpy.Copy_management(compositeLocatorPackage, "AGRC_CompositeLocator.gcpk")
+compositeLocatorPackage = "C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\ugrc_composite_locator_package.gcpk"
+print "Copying UGRC_CompositeLocator.gcpk from C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators to the C:\\Users\\gbunce\\Documents\\projects\\DataForGDrive folder ..."
+arcpy.Copy_management(compositeLocatorPackage, "UGRC_CompositeLocator.gcpk")
 
 #: now compress the files (zip them up)
 
@@ -203,6 +203,6 @@ ZipFileGeodatabase(statewide_road_network, directory + "/UtahRoadsNetworkAnalysi
 #ZipFileGeodatabase(directory + "/Roads.gdb", directory + "/Roads_gdb.zip")
 
 ##: zip the locator packages
-ZipLocatorPackages(directory, "AGRC_AddressLocatorsPackage")
+ZipLocatorPackages(directory, "UGRC_AddressLocatorsPackage")
 
 print "Done!"
