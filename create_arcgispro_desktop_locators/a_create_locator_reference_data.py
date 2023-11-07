@@ -7,7 +7,7 @@ import arcpy, shutil, os
 
 # variables
 # sgidAddressPoints = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.LOCATION.AddressPoints"
-sgidAddressPoints = "C:\\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2022_8_4.gdb\\AddressPoints" #: use local copy when at home
+sgidAddressPoints = "C:\\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2022_11_14.gdb\\AddressPoints" #: use local copy when at home
 rebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators'
 previousRebuildLocators_Folder = 'C:\\Users\\gbunce\\Documents\\projects\\RebuildAddressLocators\\_previousRebuild'
 arcpy.env.workspace = "C:/Users/gbunce/Documents/projects/RebuildAddressLocators"

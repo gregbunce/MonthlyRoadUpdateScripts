@@ -132,10 +132,10 @@ if __name__ == "__main__":
         formatted_date_with_time = str(year) + "mon" + str(month) + "d" + str(day) + "h" + str(hour) + "min" + str(min)
 
         # data paths
-        arcpy.env.workspace = 'C:/Users/gbunce/Documents/projects/BoundaryChanges/Boundaries.gdb'
+        arcpy.env.workspace = 'C:/Users/gbunce/Documents/BoundaryChanges/Boundaries.gdb'
         boundaryFGDB = 'Boundaries.gdb'
         changesFGDB = 'Changes_' + formatted_date + '.gdb'
-        projectFolder = 'C:/Users/gbunce/Documents/projects/BoundaryChanges'
+        projectFolder = 'C:/Users/gbunce/Documents/BoundaryChanges'
         sgid_connection = 'Database Connections/internal@SGID@internal.agrc.utah.gov.sde/SGID.'
 
         # datasets
@@ -163,7 +163,7 @@ if __name__ == "__main__":
         GetBoundaryUpdates_Count()
 
         # compact the boundaries fgdb
-        arcpy.Compact_management('C:/Users/gbunce/Documents/projects/BoundaryChanges/Boundaries.gdb')
+        arcpy.Compact_management('C:/Users/gbunce/Documents/BoundaryChanges/Boundaries.gdb')
 
         print("Done!")
         log_file.write("Finished at: " + str(datetime.datetime.now()) + "\n")
@@ -173,5 +173,3 @@ if __name__ == "__main__":
         print(e.args[0])
         log_file.write("ERROR MESSAGE: " + e.args[0]+ "\n")
         #log_file.write('An exception has occured - %s' % e)
-
-

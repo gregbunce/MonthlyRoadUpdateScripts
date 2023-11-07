@@ -6,7 +6,7 @@ import os
 #from datetime import datetime
 
 #: Notes before running: verify that these variables are pointing to the correct data (ie: at home vs at work)
-    #: python 2.7
+    #: python 3
     # sgid_roads
 
 # get the date
@@ -14,7 +14,7 @@ import os
 #strDate = str(today.month).zfill(2) + str(today.day).zfill(2) +  str(today.year) 
 
 # sgid_roads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads" #: use a local copy when connected to the VPN
-sgid_roads = "C:\Users\\gbunce\\Documents\\SGID\\local_sgid_data\\SGID_2023_11_6.gdb\\Roads"
+sgid_roads = r"C:\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2023_6_8.gdb\\Roads"
 
 # main function
 def main():
@@ -26,31 +26,31 @@ def main():
     day = now.day
     folder_name = str(year) + "_" + str(month) + "_" + str(day)
     # create the folder
-    print "Creating Directory..."
+    print("Creating Directory...")
     directory = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\" + folder_name
     if not os.path.exists(directory):
-        print "Creating Directory: " + str(directory) + " ..."
+        print("Creating Directory: " + str(directory) + " ...")
         os.makedirs(directory)
     else:
-        print "Directory: " + str(directory) + " exists."
+        print("Directory: " + str(directory) + " exists.")
 
 
     # create new fgdb
-    print "Creating File Geodatabase..."
+    print("Creating File Geodatabase...")
     network_fgdb = arcpy.CreateFileGDB_management(directory, 'UtahRoadsNetworkAnalysis.gdb')
 
     # create dataset in the fgdb
-    print "Creating Feature Dataset..."
+    print("Creating Feature Dataset...")
     arcpy.CreateFeatureDataset_management(network_fgdb, 'NetworkDataset', sgid_roads)
 
     # import the sgid roads fc
-    print "Importing SGID Roads ..."
+    print("Importing SGID Roads ...")
     #expression = "ZIPCODE_L in ('84108', '84106', '84105')" ##TESTING STUFF##
     expression = ""
     network_roads = arcpy.FeatureClassToFeatureClass_conversion(sgid_roads, str(network_fgdb) + r'/NetworkDataset', 'Roads', expression)
 
     ## add the needed fields ##
-    print "Add needed network fields to fgdb road data"
+    print("Add needed network fields to fgdb road data")
     arcpy.AddField_management(network_roads,"NETSUBTYPE", "SHORT", "","","")
     arcpy.AddField_management(network_roads,"USEEXIST", "TEXT", "","","1")
     arcpy.AddField_management(network_roads,"URBTRAFFIC", "TEXT", "","","1")
@@ -86,7 +86,7 @@ def main():
 
     ## begin calculating the field values ##
     ## USEEXIST ##
-    print "Calculate USEEXIST fields..."
+    print("Calculate USEEXIST fields...")
     # Yes    
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "not (SPEED_LMT is null) and ( SPEED_LMT >= 5 and SPEED_LMT <= 80)")
     arcpy.CalculateField_management(urban_roads_selected, field="USEEXIST", expression='"Y"', expression_type='VB', code_block='')
@@ -96,7 +96,7 @@ def main():
     arcpy.CalculateField_management(urban_roads_selected, field="SPEED_LMT", expression='25', expression_type='VB', code_block='')
 
     ## SPEED_LMT ##
-    print "Calculate speed limits..."
+    print("Calculate speed limits...")
     # 70 mph - UDOT limited access highway and freeways
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' OR ((DOT_RTNAME = '0201P' OR DOT_RTNAME = '0201N') and CARTOCODE = '4') OR CARTOCODE = '2'")
     arcpy.CalculateField_management(urban_roads_selected, field="SPEED_LMT", expression='70', expression_type='VB', code_block='')
@@ -143,7 +143,7 @@ def main():
 
 
     #### PART 2: Calculate Travel Cost Impedance ####
-    print "Calculate Travel Cost Impedance..."
+    print("Calculate Travel Cost Impedance...")
     # calculate impedance (in minutes) for all ramp-accessed roads (freeways)
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' or CARTOCODE = '2' or CARTOCODE = '4' or DOT_RTNAME like '%R%' or DOT_RTNAME like '%C%' or URBTRAFFIC = 'N'")
     arcpy.CalculateField_management(urban_roads_selected, field="IMPED_MIN", expression='([SHAPE_Length]/1609 * 60) / [SPEED_LMT]', expression_type='VB', code_block='')
@@ -156,7 +156,7 @@ def main():
     arcpy.CalculateField_management(urban_roads_selected, field="IMPED_MIN", expression='([SHAPE_Length]/1609 * 60) / [SPEED_LMT] * 1.2', expression_type='VB', code_block='')
 
     ## impedance needed to be be set differently for each direction on one way streets and routes. Check to see if ONE_WAY attributes for limited access freeways/highways need to be fixed
-    print "Calculate one ways..."
+    print("Calculate one ways...")
     # for both directions of travel on I-215 (semi-looping), set the ONE_WAY attribute using manual selection so that all features oriented in the true direction of travel are set to 1 and the others to 2
     # oneway codes [0 = Two way travel; 1 = One way travel in direction of arc; 2 = One way travel in opposite direction of arc]
     # set oneway to '1'
@@ -204,7 +204,7 @@ def main():
 
 
     ## Calculate the travel cost fields and then inflate the travel cost for the wrong direction of travel on one way segments by a large factor (100 x current impedance is currently used)
-    print "Calculate T_F_IMP_MIN and F_T_IMP_MIN values..."
+    print("Calculate T_F_IMP_MIN and F_T_IMP_MIN values...")
     # Transfer over all IMPED_MIN values to both T_F_IMP_MIN and F_T_IMP_MIN fields.
     # clear selection 
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','CLEAR_SELECTION')
@@ -222,7 +222,7 @@ def main():
     ## Part 3 - Build the network dataset
     # Create 2 different values for the NETSUBTYPE field so connectivity can be modeled at endpoints for limited access highways and ramps and at any vertex for other, surface streets:
     # Query for limited access features and set NETSUBTYPE = 1 and set EXCL_WALK = Y
-    print "Calculate NETSUBTYPE values..." 
+    print("Calculate NETSUBTYPE values...")
     urban_roads_selected = arcpy.SelectLayerByAttribute_management('network_roads_lyr','NEW_SELECTION', "CARTOCODE = '1' or CARTOCODE = '2' or CARTOCODE = '4' or DOT_RTNAME like '%R%' or DOT_RTNAME like '%C%'")
     arcpy.CalculateField_management(urban_roads_selected, field="NETSUBTYPE", expression='1', expression_type='VB', code_block='')
     arcpy.CalculateField_management(urban_roads_selected, field="EXCL_WALK", expression='Y', expression_type='VB', code_block='')
@@ -237,7 +237,7 @@ def main():
     # create Subtypes to define the two geodatabase subtypes using the NETSUBTYPE field
     # Code: "1" || Description "Limited Access & Ramps"
     # Code: "2" || Description "Other"
-    print "Create SUBTYPES for Limited Access & Ramps and Other..." 
+    print("Create SUBTYPES for Limited Access & Ramps and Other...")
     arcpy.SetSubtypeField_management(network_roads, field="NETSUBTYPE", clear_value="false")
     arcpy.AddSubtype_management(network_roads, subtype_code="1", subtype_description="Limited Access & Ramps")
     arcpy.AddSubtype_management(network_roads, subtype_code="2", subtype_description="Other")
@@ -245,7 +245,7 @@ def main():
     # build the netork based on an existing network .xml file template
     ## this is done in a seperate script b/c it needs to be run in Desktop 10.6 (or higher) or Pro
     ## use this script: "agrc_roadnetwork_create_and_build_network_run2nd.py"
-    print "Done!"
+    print("Done!")
 
 
 
@@ -274,15 +274,15 @@ def import_RoadsIntoNetworkDataset(sgid_roads_to_import, network_roads):
 
 def generate_scratch_data(directory):
     # create new fgdb
-    print "Creating Scratch File Geodatabase..."
+    print("Creating Scratch File Geodatabase...")
     network_fgdb = arcpy.CreateFileGDB_management(directory, 'NetworkBuild_scratchData.gdb')
 
     # union the census urban areas and the sgid muni
-    print "Union the Census Urban Areas and SGID Munis"
+    print("Union the Census Urban Areas and SGID Munis")
     unioned_fc = arcpy.Union_analysis(in_features="'Database Connections/internal@SGID@internal.agrc.utah.gov.sde/SGID.DEMOGRAPHIC.UrbanAreasCensus2010' #;'Database Connections/internal@SGID@internal.agrc.utah.gov.sde/SGID.BOUNDARIES.Municipalities' #", out_feature_class= str(directory) + "/NetworkBuild_scratchData.gdb/UrbanAreasMuni_Union", join_attributes="ONLY_FID", cluster_tolerance="", gaps="GAPS")
 
     # dissolve this unioned data
-    print "Dissolve the unioned layer"
+    print("Dissolve the unioned layer")
     return arcpy.Dissolve_management(in_features=unioned_fc, out_feature_class= str(directory) + "/NetworkBuild_scratchData.gdb/UrbanAreasMuni_Union_Dissolved", dissolve_field="", statistics_fields="", multi_part="MULTI_PART", unsplit_lines="DISSOLVE_LINES")
 
 
