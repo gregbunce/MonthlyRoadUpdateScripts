@@ -1,8 +1,8 @@
 import arcpy, os, shutil, datetime, zipfile, glob
 
 #: Notes before running: verify that these variables are pointing to the correct data (ie: VPN vs at work)
-mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_11062023.gdb"
-statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2023_11_6\\UtahRoadsNetworkAnalysis.gdb"
+mmp_network = "C:\\Users\\gbunce\\Documents\\projects\\MultimodalNetwork\\MM_NetworkDataset_08132024.gdb"
+statewide_road_network = "C:\\Users\\gbunce\\Documents\\projects\\NetworkDataset\\RecentBuilds\\2024_7_19\\UtahRoadsNetworkAnalysis.gdb"
 roadGrinderDatabase = "C:\\Temp\\RoadGrinder.gdb" # this path and file name should be stable, not needing to be repointed
 ng911Database = "C:\\Temp\\NG911GIS_Schema.gdb" # this path and file name should be stable, not needing to be repointed
 # sgidRoads (roads are now accessed via open data so this process is no longer needed)
@@ -162,8 +162,8 @@ arcpy.env.workspace = directory
 
 ##: zip the geodatabases
 #: (we're no longer uploading this dataset) ZipFileGeodatabase(roadGrinderDatabase, directory + "/RoadGrinder_gdb.zip")
-ZipFileGeodatabase(ng911Database, directory + "/UtahNG911GIS_gdb.zip")
-ZipFileGeodatabase(mmp_network, directory + "/MM_NetworkDataset_gdb.zip")
+#ZipFileGeodatabase(ng911Database, directory + "/UtahNG911GIS_gdb.zip")
+#ZipFileGeodatabase(mmp_network, directory + "/MM_NetworkDataset_gdb.zip")
 ZipFileGeodatabase(statewide_road_network, directory + "/UtahRoadsNetworkAnalysis_gdb.zip")
 
 

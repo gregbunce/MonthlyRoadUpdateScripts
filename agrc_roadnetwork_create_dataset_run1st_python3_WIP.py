@@ -14,7 +14,7 @@ import os
 #strDate = str(today.month).zfill(2) + str(today.day).zfill(2) +  str(today.year) 
 
 # sgid_roads = "Database Connections\\internal@SGID@internal.agrc.utah.gov.sde\\SGID.TRANSPORTATION.Roads" #: use a local copy when connected to the VPN
-sgid_roads = r"C:\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2023_6_8.gdb\\Roads"
+sgid_roads = r"C:\Users\\gbunce\\Documents\\projects\\SGID\\local_sgid_data\\SGID_2023_8_29.gdb\\Roads"
 
 # main function
 def main():
