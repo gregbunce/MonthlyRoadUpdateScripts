@@ -66,8 +66,8 @@ def NullOutSpatialValuesIfChangesFound(sgid_polygon_containing_edits):
             field_array = ['QUADRANT_L', 'QUADRANT_R', 'ADDRSYS_L', 'ADDRSYS_R']
         elif str(sgid_polygon_containing_edits) == "SymDiff_Counties":
             field_array = ['COUNTY_L', 'COUNTY_R']
-        elif str(sgid_polygon_containing_edits) == "SymDiff_MetroTownships":
-            field_array = ['UNINCCOM_L', 'UNINCCOM_R']
+        # elif str(sgid_polygon_containing_edits) == "SymDiff_MetroTownships":
+        #     field_array = ['UNINCCOM_L', 'UNINCCOM_R']
         elif str(sgid_polygon_containing_edits) == "SymDiff_Municipalities":
             field_array = ['INCMUNI_L', 'INCMUNI_R']
         elif str(sgid_polygon_containing_edits) == "SymDiff_ZipCodes":
@@ -141,10 +141,10 @@ if __name__ == "__main__":
         # datasets
         address_sys_quads = 'AddressSystemQuadrants'
         counties = 'Counties'
-        metro_townships = 'MetroTownships'
+        # metro_townships = 'MetroTownships'
         munis = 'Municipalities'
         zips = 'ZipCodes'
-        feature_class_list = [address_sys_quads, counties, metro_townships, munis, zips]
+        feature_class_list = [address_sys_quads, counties, munis, zips]
         print(feature_class_list)
 
         # create text file for logging
